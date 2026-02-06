@@ -48,6 +48,7 @@ Nishit Gupta
 Shivam Kumar
 
 
+Shiwangi Priya
 ## Instructions for Team Members
 
 ### 1. Repository Setup
