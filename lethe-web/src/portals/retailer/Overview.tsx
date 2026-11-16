@@ -67,7 +67,7 @@ export function Overview() {
       />
 
       {s.alerts.length > 0 && (
-        <div className="mb-5 space-y-3">
+        <div className="retailer-alert-list">
           {s.alerts.map((a) => (
             <Callout
               key={a.rc.recall_id}
@@ -75,7 +75,7 @@ export function Overview() {
               icon={Siren}
               title={`Recall #${a.rc.recall_id}: ${L.medName(a.rc.batch_id)} batch ${L.batchNo(a.rc.batch_id)}`}
               action={
-                <div className="flex flex-col gap-1.5 sm:flex-row">
+                <div className="retailer-alert-btns">
                   {!a.acked && a.mine.length > 0 && (
                     <Button size="sm" icon={BellRing} loading={busy === `ack-${a.rc.recall_id}`} onClick={() => void acknowledge(a.rc.recall_id)}>
                       Acknowledge
@@ -89,11 +89,11 @@ export function Overview() {
             >
               {a.rc.recall_reason}
               {a.held && (
-                <span className="mt-1 block font-medium text-critical-text">
+                <span className="retailer-alert-held">
                   Your pharmacy received {num(a.held.qty)} units of this batch (order {a.held.orders.map((o) => `#${o}`).join(', ')}). Return them.
                 </span>
               )}
-              {a.acked && <span className="mt-1 block text-xs">Acknowledged</span>}
+              {a.acked && <span className="retailer-alert-acked">Acknowledged</span>}
             </Callout>
           ))}
         </div>
@@ -108,19 +108,19 @@ export function Overview() {
         <Stat label="Open returns" value={num(s.openReturns.length)} sub="in reverse logistics" icon={Undo2} tone="serious" loading={m.isLoading} onClick={() => navigate('/retailer/returns')} />
       </StatGrid>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-5">
+      <div className="retailer-main-row grid gap-5 xl:grid-cols-5">
         <Card className="xl:col-span-3">
           <CardHeader title="Recent orders" subtitle="Where each purchase order is in the flow" actions={<Button size="sm" variant="ghost" onClick={() => navigate('/retailer/orders')}>All orders</Button>} />
-          <CardBody className="space-y-3">
+          <CardBody>
             {m.orders.length === 0 && <EmptyState icon={ShoppingCart} title="No orders yet" />}
             {m.orders.slice(0, 5).map((x) => (
-              <div key={x.o.order_id} className="rounded-xl border border-line p-3.5">
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div key={x.o.order_id} className="retailer-order-box">
+                <div className="retailer-order-box-top">
                   <div className="flex items-center gap-2">
-                    <span className="text-[14px] font-semibold text-ink tabular">Order #{x.o.order_id}</span>
+                    <span className="retailer-order-no">Order #{x.o.order_id}</span>
                     <StatusBadge value={x.o.order_status} meta={ORDER_STATUS} />
                   </div>
-                  <span className="text-[12.5px] text-ink-2">
+                  <span className="retailer-order-meta">
                     {x.items.length} lines · {money(x.value)} · expected {date(x.o.expected_del_date)}
                   </span>
                 </div>
@@ -130,7 +130,7 @@ export function Overview() {
           </CardBody>
         </Card>
 
-        <div className="space-y-5 xl:col-span-2">
+        <div className="retailer-side-col xl:col-span-2">
           <Card>
             <CardHeader title="Order mix" subtitle="All purchase orders by status" />
             <CardBody>
@@ -147,13 +147,13 @@ export function Overview() {
           </Card>
           <Card>
             <CardHeader title="On the road" subtitle="Shipments heading to your pharmacy" icon={Truck} />
-            <CardBody className="space-y-2">
-              {s.arriving.length === 0 && <p className="text-[13px] text-ink-2">Nothing in transit right now.</p>}
+            <CardBody>
+              {s.arriving.length === 0 && <p className="retailer-none-text">Nothing in transit right now.</p>}
               {s.arriving.map((x) => (
-                <button key={x.o.order_id} onClick={() => navigate('/retailer/receiving')} className="flex w-full items-center justify-between gap-2 rounded-xl bg-surface-2 px-3 py-2.5 text-left hover:bg-surface-3">
+                <button key={x.o.order_id} onClick={() => navigate('/retailer/receiving')} className="retailer-road-item">
                   <span>
-                    <span className="block text-[13px] font-medium text-ink">Order #{x.o.order_id}</span>
-                    <span className="block text-xs text-ink-2">
+                    <span className="retailer-road-title">Order #{x.o.order_id}</span>
+                    <span className="retailer-road-sub">
                       {x.manifest ? `${L.vehicle.get(x.manifest.vehicle_id)?.vehicle_no} · ETA ${x.manifest.estimated_arrival_time ? relative(x.manifest.estimated_arrival_time) : 'n/a'}` : 'Awaiting manifest'}
                     </span>
                   </span>
@@ -169,11 +169,11 @@ export function Overview() {
                 {(() => {
                   const x = m.returns[0]
                   return (
-                    <div className="text-[13px]">
-                      <p className="font-medium text-ink">
+                    <div className="retailer-latest-return">
+                      <p className="retailer-latest-title">
                         Return #{x.r.return_id} · <Code>{L.batchNo(x.r.batch_id)}</Code>
                       </p>
-                      <p className="mt-0.5 text-ink-2">
+                      <p className="retailer-latest-sub">
                         {num(x.r.quantity_returned)} units · {x.r.status.replace('_', ' ')} {x.v ? `· refund ${money(x.v.refund_amount)}` : ''}
                       </p>
                     </div>

@@ -79,27 +79,27 @@ function AssessModal({ ret, onClose }: { ret: ReturnRequest | null; onClose: () 
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="mfr-stack">
         <Callout tone={ret.recall_id ? 'critical' : 'neutral'} title={ret.recall_id ? `Returned under recall #${ret.recall_id}` : 'Claim reason'}>
           {ret.return_reason}
         </Callout>
         <Field label="Inspection findings" required>
           <Textarea value={findings} onChange={(e) => setFindings(e.target.value)} placeholder="Seals intact, temperature log verified…" />
         </Field>
-        <div className="grid gap-2">
+        <div className="mfr-dispo-list">
           {(Object.keys(DISPOSITION) as Disposition[]).map((d) => (
             <button
               key={d}
               type="button"
               onClick={() => setDisposition(d)}
-              className={`flex items-start gap-3 rounded-xl border p-3 text-left transition-colors ${disposition === d ? 'border-accent bg-accent-soft' : 'border-line hover:bg-surface-2'}`}
+              className={`mfr-dispo-btn ${disposition === d ? 'mfr-dispo-btn-on' : ''}`}
             >
-              <span className={`mt-0.5 grid size-4 shrink-0 place-items-center rounded-full border ${disposition === d ? 'border-accent' : 'border-line-strong'}`}>
-                {disposition === d && <span className="size-2 rounded-full bg-accent" />}
+              <span className={`mfr-fake-radio ${disposition === d ? 'mfr-fake-radio-on' : ''}`}>
+                {disposition === d && <span className="mfr-fake-radio-dot" />}
               </span>
               <span>
-                <span className="block text-[13.5px] font-semibold text-ink">{DISPOSITION[d].label}</span>
-                <span className="block text-xs text-ink-2">{DISPOSITION[d].hint}</span>
+                <span className="mfr-dispo-name">{DISPOSITION[d].label}</span>
+                <span className="mfr-dispo-hint">{DISPOSITION[d].hint}</span>
               </span>
             </button>
           ))}
@@ -155,7 +155,7 @@ function DisposeModal({ ret, assessmentId, onClose }: { ret: ReturnRequest | nul
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="mfr-stack">
         <Field label="Disposal method">
           <Select value={method} onChange={(e) => setMethod(e.target.value)}>
             {DISPOSAL_METHODS.map((m) => (
@@ -166,7 +166,7 @@ function DisposeModal({ ret, assessmentId, onClose }: { ret: ReturnRequest | nul
           </Select>
         </Field>
         <Field label="Evidence hash" hint="SHA-256 fingerprint of the destruction record, generated in your browser.">
-          <Input readOnly value={hash} className="font-mono text-xs" />
+          <Input readOnly value={hash} className="mfr-hash-input" />
         </Field>
         <Callout tone="warn">Certificates are permanent. Two triggers fire: one writes a HIGH-severity DRUGS_DESTROYED event, the other books the loss in financial analytics.</Callout>
       </div>
@@ -297,7 +297,7 @@ export function Returns() {
   const pendingPayout = model.rows.filter((x) => x.v?.refund_status === 'Pending_Payout').reduce((s, x) => s + Number(x.v!.refund_amount), 0)
 
   const columns: Column<Row>[] = [
-    { key: 'id', header: 'Return', sort: (x) => x.r.return_id, cell: (x) => <span className="font-medium text-ink tabular">#{x.r.return_id}</span> },
+    { key: 'id', header: 'Return', sort: (x) => x.r.return_id, cell: (x) => <span className="mfr-return-id">#{x.r.return_id}</span> },
     {
       key: 'batch',
       header: 'Batch',
@@ -305,18 +305,18 @@ export function Returns() {
       cell: (x) => (
         <div>
           <Code>{L.batchNo(x.r.batch_id)}</Code>
-          <p className="mt-0.5 text-xs text-ink-2">{L.medName(x.r.batch_id)}</p>
+          <p className="mfr-cell-sub">{L.medName(x.r.batch_id)}</p>
         </div>
       ),
     },
-    { key: 'from', header: 'Returned by', sort: (x) => L.orgName(x.r.returner_org_id), cell: (x) => <span className="text-[13px]">{L.orgName(x.r.returner_org_id)}</span>, hideBelow: 'md' },
+    { key: 'from', header: 'Returned by', sort: (x) => L.orgName(x.r.returner_org_id), cell: (x) => <span className="mfr-cell-text">{L.orgName(x.r.returner_org_id)}</span>, hideBelow: 'md' },
     { key: 'qty', header: 'Units', align: 'right', sort: (x) => x.r.quantity_returned, cell: (x) => num(x.r.quantity_returned) },
     {
       key: 'reason',
       header: 'Reason',
       cell: (x) => (
-        <div className="max-w-[240px]">
-          <p className="truncate text-[13px] text-ink-2" title={x.r.return_reason}>
+        <div className="mfr-reason-cell">
+          <p className="mfr-reason-text" title={x.r.return_reason}>
             {x.r.return_reason}
           </p>
           {x.r.recall_id && <Badge tone="critical">Recall #{x.r.recall_id}</Badge>}
@@ -330,13 +330,13 @@ export function Returns() {
       header: 'Outcome',
       cell: (x) =>
         x.a ? (
-          <div className="flex flex-col items-start gap-1">
+          <div className="mfr-outcome-cell">
             <StatusBadge value={x.a.disposition_action} meta={DISPOSITION} />
-            {x.v && <span className="text-xs text-ink-2">{money(x.v.refund_amount)} · {REFUND_STATUS[x.v.refund_status].label}</span>}
-            {x.cert && <span className="text-xs text-ink-2">Destroyed · {humanize(x.cert.disposal_method)}</span>}
+            {x.v && <span className="mfr-cell-sub">{money(x.v.refund_amount)} · {REFUND_STATUS[x.v.refund_status].label}</span>}
+            {x.cert && <span className="mfr-cell-sub">Destroyed · {humanize(x.cert.disposal_method)}</span>}
           </div>
         ) : (
-          <span className="text-xs text-muted">Not inspected</span>
+          <span className="mfr-cell-muted">Not inspected</span>
         ),
     },
     {
@@ -355,9 +355,9 @@ export function Returns() {
           case 'close':
             return <Button size="xs" icon={CheckCircle2} loading={busy === `close-${x.r.return_id}`} onClick={() => void close(x.r)}>Close</Button>
           case 'done':
-            return <span className="text-xs text-good-text">Complete</span>
+            return <span className="mfr-done-text">Complete</span>
           default:
-            return <span className="text-xs text-muted">Awaiting depot</span>
+            return <span className="mfr-cell-muted">Awaiting depot</span>
         }
       },
     },
@@ -373,9 +373,9 @@ export function Returns() {
         <Stat label="Disposal certificates" value={num(model.rows.filter((x) => x.cert).length)} sub="witnessed destructions" icon={Flame} tone="serious" />
       </StatGrid>
 
-      <Card className="mt-5">
+      <Card className="mfr-returns-card">
         <CardHeader title="Reverse logistics pipeline" subtitle="Filed → In transit → Received → Assessed → Closed. Distributors handle pickup and receipt; you inspect and decide." />
-        <div className="px-5 pb-4">
+        <div className="mfr-returns-filter">
           <Segmented<Filter>
             value={filter}
             onChange={setFilter}

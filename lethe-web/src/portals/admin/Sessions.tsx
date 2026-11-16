@@ -29,11 +29,11 @@ export function Sessions() {
   }, [t.data.sessions])
 
   const cols: Column<UserSession>[] = [
-    { key: 'user', header: 'User', sort: (s) => L.userName(s.user_id), cell: (s) => <div><p className="font-medium text-ink">{L.userName(s.user_id)}</p><p className="text-xs text-ink-2">{L.orgName(L.user.get(s.user_id ?? '')?.org_id)}</p></div> },
-    { key: 'ip', header: 'Source', cell: (s) => <span className="font-mono text-[12px] text-ink-2">{s.ip_address ?? '—'}</span>, hideBelow: 'md' },
-    { key: 'in', header: 'Signed in', sort: (s) => s.login_time_utc, cell: (s) => <span className="text-[13px] text-ink-2 tabular" title={dateTime(s.login_time_utc)}>{dateTime(s.login_time_utc)}</span> },
-    { key: 'out', header: 'Signed out', sort: (s) => s.log_out_time_utc ?? '', cell: (s) => <span className="text-[13px] text-ink-2 tabular">{s.log_out_time_utc ? dateTime(s.log_out_time_utc) : '—'}</span>, hideBelow: 'lg' },
-    { key: 'dur', header: 'Duration', cell: (s) => <span className="text-[13px] text-ink-2">{duration(s) ?? '—'}</span>, hideBelow: 'lg' },
+    { key: 'user', header: 'User', sort: (s) => L.userName(s.user_id), cell: (s) => <div><p className="admin-cell-main">{L.userName(s.user_id)}</p><p className="admin-cell-sub">{L.orgName(L.user.get(s.user_id ?? '')?.org_id)}</p></div> },
+    { key: 'ip', header: 'Source', cell: (s) => <span className="admin-cell-ip">{s.ip_address ?? '—'}</span>, hideBelow: 'md' },
+    { key: 'in', header: 'Signed in', sort: (s) => s.login_time_utc, cell: (s) => <span className="admin-cell-text" title={dateTime(s.login_time_utc)}>{dateTime(s.login_time_utc)}</span> },
+    { key: 'out', header: 'Signed out', sort: (s) => s.log_out_time_utc ?? '', cell: (s) => <span className="admin-cell-text">{s.log_out_time_utc ? dateTime(s.log_out_time_utc) : '—'}</span>, hideBelow: 'lg' },
+    { key: 'dur', header: 'Duration', cell: (s) => <span className="admin-cell-text">{duration(s) ?? '—'}</span>, hideBelow: 'lg' },
     { key: 'state', header: 'State', sort: (s) => (s.log_out_time_utc ? 1 : 0), cell: (s) => (s.log_out_time_utc ? <Badge>Ended</Badge> : <Badge tone="good" dot>Open</Badge>) },
   ]
 
@@ -46,24 +46,24 @@ export function Sessions() {
         <Stat label="Distinct users" value={num(stats.users)} sub="have signed in" icon={Users} tone="info" />
         <Stat label="Latest sign-in" value={stats.last ? relative(stats.last) : '—'} sub={stats.last ? dateTime(stats.last) : ''} icon={ShieldCheck} tone="accent" />
       </StatGrid>
-      <div className="mt-5 grid gap-5 2xl:grid-cols-5">
+      <div className="admin-sessions-grid grid gap-5 2xl:grid-cols-5">
         <Card className="2xl:col-span-3">
           <CardHeader title="Session log" subtitle="Each sign-in through Lethe inserts a row; the trigger mirrors it to the audit ledger" />
           <DataTable bare rows={t.data.sessions} columns={cols} rowKey={(s) => s.session_id} loading={t.isLoading} initialSort={{ key: 'in', dir: 'desc' }} searchText={(s) => `${L.userName(s.user_id)} ${s.ip_address ?? ''}`} />
         </Card>
         <Card className="2xl:col-span-2">
           <CardHeader title="Identity events" subtitle="Live feed from the IDENTITY module" />
-          <CardBody className="px-0 pb-2">
-            <ul className="divide-y divide-line">
+          <CardBody className="admin-feed-body">
+            <ul className="admin-feed-list">
               {(feed.data ?? []).map((e) => (
-                <li key={e.log_id} className="px-5 py-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="truncate text-[13px] font-medium text-ink">{humanize(e.action_type)}</span>
+                <li key={e.log_id} className="admin-feed-item">
+                  <div className="admin-feed-top">
+                    <span className="admin-feed-action">{humanize(e.action_type)}</span>
                     <Badge tone={SEVERITY_TONE[severityOf(e)]} dot>
                       {severityOf(e).toLowerCase()}
                     </Badge>
                   </div>
-                  <p className="mt-0.5 truncate text-xs text-ink-2">
+                  <p className="admin-feed-meta">
                     {e.user_id ? L.userName(e.user_id) : 'System'} · {e.ip_address ?? 'no IP'} · {relative(e.log_time_stamp_utc)}
                   </p>
                 </li>

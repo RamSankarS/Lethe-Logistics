@@ -92,7 +92,7 @@ export function RiskOverview() {
         <Stat label="Losses booked" value={moneyCompact(m.losses)} sub="spoilage, damage, recall, disposal" icon={Flame} tone="serious" onClick={() => navigate('/compliance/financial')} />
       </StatGrid>
 
-      <div className="mt-5 grid gap-5 2xl:grid-cols-5">
+      <div className="comp-gap-top grid gap-5 2xl:grid-cols-5">
         <Card className="2xl:col-span-3">
           <CardHeader title="Compliance risk heatmap" subtitle="Ledger events per module and severity. Darker cells mean more events." icon={ShieldAlert} />
           <CardBody>
@@ -105,19 +105,19 @@ export function RiskOverview() {
         </Card>
         <Card className="2xl:col-span-2">
           <CardHeader title="Department risk summary" subtitle="financial_analytics.vw_compliance_risk_heatmap" />
-          <CardBody className="px-0 pb-2">
-            <div className="divide-y divide-line">
+          <CardBody className="comp-list-body">
+            <div className="comp-dept-list">
               {[...t.data.vwRiskHeatmap]
                 .sort((a, b) => b.critical_violations * 100 + b.high_risk_warnings - (a.critical_violations * 100 + a.high_risk_warnings))
                 .map((r) => (
-                  <div key={r.department} className="flex items-center justify-between gap-3 px-5 py-2.5">
-                    <div className="min-w-0">
-                      <p className="truncate text-[13.5px] font-medium text-ink">{moduleLabel(r.department)}</p>
-                      <p className="text-xs text-ink-2">
+                  <div key={r.department} className="comp-dept-row">
+                    <div className="comp-dept-text">
+                      <p className="comp-dept-name">{moduleLabel(r.department)}</p>
+                      <p className="comp-small-grey">
                         {num(r.total_events)} events · last {relative(r.last_violation_time)}
                       </p>
                     </div>
-                    <div className="flex shrink-0 gap-1.5">
+                    <div className="comp-dept-tags">
                       <Badge tone={r.critical_violations ? 'critical' : 'neutral'} dot>
                         {r.critical_violations} critical
                       </Badge>
@@ -132,7 +132,7 @@ export function RiskOverview() {
         </Card>
       </div>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-5">
+      <div className="comp-gap-top-2 grid gap-5 xl:grid-cols-5">
         <Card className="xl:col-span-3">
           <CardHeader title="Ledger activity by week" subtitle="All events and the critical/high subset" />
           <CardBody>
@@ -149,19 +149,19 @@ export function RiskOverview() {
         </Card>
         <Card className="xl:col-span-2">
           <CardHeader title="Latest flagged events" subtitle="Critical and high severity" />
-          <CardBody className="px-0 pb-2">
-            <ul className="divide-y divide-line">
+          <CardBody className="comp-list-body">
+            <ul className="comp-flag-list">
               {m.flagged.map((e) => {
                 const p = (e.event_payload ?? {}) as Record<string, unknown>
                 return (
-                  <li key={e.log_id} className="px-5 py-2.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="truncate text-[13px] font-medium text-ink">{humanize(e.action_type)}</span>
+                  <li key={e.log_id} className="comp-flag-item">
+                    <div className="comp-flag-top">
+                      <span className="comp-flag-name">{humanize(e.action_type)}</span>
                       <Badge tone={SEVERITY_TONE[severityOf(e)]} dot>
                         {severityOf(e).toLowerCase()}
                       </Badge>
                     </div>
-                    <p className="mt-0.5 truncate text-xs text-ink-2">
+                    <p className="comp-small-grey comp-flag-detail">
                       {moduleLabel(e.source_module)} · {String(p.reason ?? p.description ?? p.batch_number ?? L.userName(e.user_id))} · {relative(e.log_time_stamp_utc)}
                     </p>
                   </li>
@@ -172,8 +172,8 @@ export function RiskOverview() {
         </Card>
       </div>
 
-      <Callout tone="neutral" className="mt-5" title="Why this data can be trusted">
-        Every row comes from <code className="font-mono">identity_mod.auth_audit_logs</code>, which the <code className="font-mono">tr_protect_audit_logs</code> trigger makes write-once: updates and deletes are rejected for every
+      <Callout tone="neutral" className="comp-gap-top" title="Why this data can be trusted">
+        Every row comes from <code className="code-text">identity_mod.auth_audit_logs</code>, which the <code className="code-text">tr_protect_audit_logs</code> trigger makes write-once: updates and deletes are rejected for every
         role. Run the tamper test on the Audit Ledger tab to see it.
       </Callout>
     </>

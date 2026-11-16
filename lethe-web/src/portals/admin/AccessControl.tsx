@@ -43,7 +43,7 @@ function AddRole({ open, onClose }: { open: boolean; onClose: () => void }) {
   }
   return (
     <Modal open={open} onClose={onClose} size="sm" icon={ShieldPlus} title="Create a role" footer={<><Button variant="ghost" onClick={onClose}>Cancel</Button><Button variant="primary" disabled={clean.length < 3 || dup} loading={busy === 'role'} onClick={submit}>Create</Button></>}>
-      <div className="space-y-4">
+      <div className="admin-modal-form">
         <Field label="Role name" required error={dup ? 'Role already exists.' : undefined} hint="Spaces become underscores, e.g. Cold_Chain_Officer.">
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Cold Chain Officer" />
         </Field>
@@ -80,7 +80,7 @@ function AddPermission({ open, onClose }: { open: boolean; onClose: () => void }
   }
   return (
     <Modal open={open} onClose={onClose} size="sm" icon={Plus} title="Create a permission" footer={<><Button variant="ghost" onClick={onClose}>Cancel</Button><Button variant="primary" disabled={!ok || dup} loading={busy === 'perm'} onClick={submit}>Create</Button></>}>
-      <div className="space-y-4">
+      <div className="admin-modal-form">
         <Field label="Module">
           <Select value={module} onChange={(e) => setModule(e.target.value)}>
             {MODULE_CATEGORIES.map((m) => (
@@ -160,25 +160,25 @@ export function AccessControl() {
 
       <Card>
         <CardHeader title="Role-permission matrix" subtitle="identity_mod.role_permissions. Click a cell to grant or revoke. Every change is a HIGH-severity ledger event." icon={BadgeCheck} />
-        <div className="overflow-x-auto border-t border-line">
-          <table className="w-full min-w-[760px] border-collapse text-[13px]">
+        <div className="admin-matrix-scroll">
+          <table className="my-table admin-matrix-table">
             <thead>
-              <tr className="bg-surface-2">
-                <th className="sticky left-0 z-[1] bg-surface-2 px-4 py-3 text-left text-[11.5px] font-semibold tracking-wide text-muted uppercase">Role</th>
+              <tr>
+                <th className="admin-matrix-rolehead">Role</th>
                 {perms.map((p) => (
-                  <th key={p.permission_id} className="px-2 py-3 text-center align-bottom">
-                    <span className="block text-[10.5px] font-semibold tracking-wide text-muted uppercase">{p.module_category}</span>
-                    <span className="mt-0.5 block font-mono text-[11.5px] font-medium text-ink">{p.action_name}</span>
+                  <th key={p.permission_id}>
+                    <span className="admin-matrix-module">{p.module_category}</span>
+                    <span className="admin-matrix-action">{p.action_name}</span>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {t.data.roles.map((r) => (
-                <tr key={r.role_id} className="border-t border-line">
-                  <td className="sticky left-0 z-[1] bg-surface px-4 py-2.5">
-                    <p className="font-medium text-ink">{humanize(r.role_name)}</p>
-                    <p className="max-w-[260px] truncate text-xs text-ink-2" title={r.description ?? ''}>
+                <tr key={r.role_id}>
+                  <td className="admin-matrix-role">
+                    <p className="admin-role-name">{humanize(r.role_name)}</p>
+                    <p className="admin-role-desc" title={r.description ?? ''}>
                       {num(usersPerRole.get(r.role_id) ?? 0)} active users · {r.description ?? 'No description'}
                     </p>
                   </td>
@@ -186,18 +186,15 @@ export function AccessControl() {
                     const key = `${r.role_id}|${p.permission_id}`
                     const on = granted.has(key)
                     return (
-                      <td key={p.permission_id} className="px-2 py-2.5 text-center">
+                      <td key={p.permission_id}>
                         <button
                           onClick={() => void toggle(r, p)}
                           disabled={busy === `rp-${key}`}
                           aria-pressed={on}
                           aria-label={`${on ? 'Revoke' : 'Grant'} ${p.action_name} for ${r.role_name}`}
-                          className={cn(
-                            'mx-auto grid size-8 place-items-center rounded-lg border transition-colors disabled:opacity-50',
-                            on ? 'border-accent bg-accent text-accent-ink' : 'border-line bg-surface hover:border-accent hover:bg-accent-soft',
-                          )}
+                          className={cn('admin-matrix-cell', on && 'admin-cell-on')}
                         >
-                          {on && <BadgeCheck className="size-4" />}
+                          {on && '✓'}
                         </button>
                       </td>
                     )
@@ -209,33 +206,33 @@ export function AccessControl() {
         </div>
       </Card>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-2">
+      <div className="admin-access-grid grid gap-5 xl:grid-cols-2">
         <Card>
           <CardHeader title="Portal routing rules" subtitle="How a login is mapped to exactly one portal" />
-          <CardBody className="space-y-2">
+          <CardBody>
             {PORTAL_RULES.map((rule) => {
               const P = PORTALS[rule.portal]
               return (
-                <div key={rule.portal} data-portal={rule.portal} className="flex items-center justify-between gap-3 rounded-xl border border-line px-3.5 py-2.5">
-                  <span className="text-[13px] text-ink">{rule.when}</span>
-                  <span className="inline-flex shrink-0 items-center gap-2 text-[13px] font-medium text-accent-text">
-                    <ArrowRight className="size-4 text-muted" />
-                    <P.icon className="size-4" /> {P.short}
+                <div key={rule.portal} data-portal={rule.portal} className="admin-rule-row">
+                  <span className="admin-rule-when">{rule.when}</span>
+                  <span className="admin-rule-target">
+                    <ArrowRight className="admin-rule-arrow" />
+                    {P.short}
                     <Badge tone="accent">{num(portalCounts.get(rule.portal) ?? 0)}</Badge>
                   </span>
                 </div>
               )
             })}
-            <p className="pt-1 text-xs text-ink-2">{num(portalCounts.get('none') ?? 0)} active users (e.g. transporter drivers) have no portal.</p>
+            <p className="admin-small-note">{num(portalCounts.get('none') ?? 0)} active users (e.g. transporter drivers) have no portal.</p>
           </CardBody>
         </Card>
         <Card>
           <CardHeader title="Defined permissions" subtitle="identity_mod.permissions" />
-          <CardBody className="space-y-2">
+          <CardBody>
             {perms.map((p) => (
-              <div key={p.permission_id} className="flex items-center justify-between gap-3 rounded-xl bg-surface-2 px-3.5 py-2.5">
+              <div key={p.permission_id} className="admin-perm-row">
                 <Code>{p.action_name}</Code>
-                <span className="text-xs text-ink-2">
+                <span className="admin-perm-info">
                   {p.module_category} · held by {t.data.rolePermissions.filter((rp) => rp.permission_id === p.permission_id).length} role(s)
                 </span>
               </div>
@@ -243,7 +240,7 @@ export function AccessControl() {
           </CardBody>
         </Card>
       </div>
-      <Callout tone="neutral" className="mt-5">
+      <Callout tone="neutral" className="admin-note-box">
         Portal access is decided by organisation type and the Admin role. The permission matrix models fine-grained capabilities (DFD process 1.x) and is audited like every other governance change.
       </Callout>
       <AddRole open={addingRole} onClose={() => setAddingRole(false)} />

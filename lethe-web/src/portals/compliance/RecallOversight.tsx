@@ -34,32 +34,32 @@ export function RecallOversight() {
 
   type Row = (typeof m.recalls)[number]
   const cols: Column<Row>[] = [
-    { key: 'id', header: 'Recall', sort: (x) => x.r.recall_id, cell: (x) => <span className="font-semibold tabular">#{x.r.recall_id}</span> },
-    { key: 'batch', header: 'Batch', sort: (x) => L.batchNo(x.r.batch_id), cell: (x) => <div><Code>{L.batchNo(x.r.batch_id)}</Code><p className="mt-0.5 text-xs text-ink-2">{L.medName(x.r.batch_id)}</p></div> },
-    { key: 'by', header: 'Initiated by', cell: (x) => <span className="text-[13px]">{L.orgName(x.r.initiated_by_org_id)}</span>, hideBelow: 'lg' },
-    { key: 'date', header: 'Date', sort: (x) => x.r.created_at_utc, cell: (x) => <span className="text-[13px] text-ink-2 tabular">{date(x.r.created_at_utc)}</span>, hideBelow: 'md' },
+    { key: 'id', header: 'Recall', sort: (x) => x.r.recall_id, cell: (x) => <span className="comp-bold">#{x.r.recall_id}</span> },
+    { key: 'batch', header: 'Batch', sort: (x) => L.batchNo(x.r.batch_id), cell: (x) => <div><Code>{L.batchNo(x.r.batch_id)}</Code><p className="comp-sub-line">{L.medName(x.r.batch_id)}</p></div> },
+    { key: 'by', header: 'Initiated by', cell: (x) => <span className="comp-cell-small">{L.orgName(x.r.initiated_by_org_id)}</span>, hideBelow: 'lg' },
+    { key: 'date', header: 'Date', sort: (x) => x.r.created_at_utc, cell: (x) => <span className="comp-cell-grey">{date(x.r.created_at_utc)}</span>, hideBelow: 'md' },
     { key: 'status', header: 'Status', sort: (x) => x.r.quarantine_status, cell: (x) => <StatusBadge value={x.r.quarantine_status} meta={RECALL_STATUS} /> },
-    { key: 'ack', header: 'Acknowledged', align: 'right', sort: (x) => (x.orgs ? x.acked / x.orgs : 0), cell: (x) => <span className="tabular">{x.acked}/{x.orgs} <span className="text-xs text-ink-2">({pct(x.orgs ? x.acked / x.orgs : 0)})</span></span> },
-    { key: 'failed', header: 'Failed notices', align: 'right', sort: (x) => x.count('Failed'), cell: (x) => (x.count('Failed') ? <Badge tone="critical">{x.count('Failed')}</Badge> : <span className="text-muted">0</span>), hideBelow: 'md' },
+    { key: 'ack', header: 'Acknowledged', align: 'right', sort: (x) => (x.orgs ? x.acked / x.orgs : 0), cell: (x) => <span>{x.acked}/{x.orgs} <span className="comp-small-grey">({pct(x.orgs ? x.acked / x.orgs : 0)})</span></span> },
+    { key: 'failed', header: 'Failed notices', align: 'right', sort: (x) => x.count('Failed'), cell: (x) => (x.count('Failed') ? <Badge tone="critical">{x.count('Failed')}</Badge> : <span className="comp-muted">0</span>), hideBelow: 'md' },
     { key: 'units', header: 'Units returned', align: 'right', sort: (x) => x.units, cell: (x) => num(x.units) },
     { key: 'refunds', header: 'Refunds', align: 'right', sort: (x) => x.refunds, cell: (x) => money(x.refunds), hideBelow: 'lg' },
   ]
 
   const certCols: Column<DisposalCertificate>[] = [
-    { key: 'id', header: 'Certificate', sort: (c) => c.certificate_id, cell: (c) => <span className="font-semibold tabular">#{c.certificate_id}</span> },
+    { key: 'id', header: 'Certificate', sort: (c) => c.certificate_id, cell: (c) => <span className="comp-bold">#{c.certificate_id}</span> },
     {
       key: 'batch',
       header: 'Batch destroyed',
       cell: (c) => {
         const a = m.assessById.get(c.assessment_id)
         const r = a ? m.returnById.get(a.return_id) : undefined
-        return r ? <div><Code>{L.batchNo(r.batch_id)}</Code><p className="mt-0.5 text-xs text-ink-2">{num(r.quantity_returned)} units · return #{r.return_id}</p></div> : '—'
+        return r ? <div><Code>{L.batchNo(r.batch_id)}</Code><p className="comp-sub-line">{num(r.quantity_returned)} units · return #{r.return_id}</p></div> : '—'
       },
     },
     { key: 'method', header: 'Method', sort: (c) => c.disposal_method, cell: (c) => <Badge tone="serious" icon={Flame}>{humanize(c.disposal_method)}</Badge> },
-    { key: 'witness', header: 'Witness', cell: (c) => <span className="text-[13px]">{L.userName(c.witness_user_id)}</span>, hideBelow: 'md' },
-    { key: 'hash', header: 'Evidence hash', cell: (c) => <Code className="text-[11px]">{c.evidence_hash.slice(0, 28)}…</Code>, hideBelow: 'lg' },
-    { key: 'when', header: 'Disposed', sort: (c) => c.disposed_at_utc, cell: (c) => <span className="text-[13px] text-ink-2 tabular">{dateTime(c.disposed_at_utc)}</span> },
+    { key: 'witness', header: 'Witness', cell: (c) => <span className="comp-cell-small">{L.userName(c.witness_user_id)}</span>, hideBelow: 'md' },
+    { key: 'hash', header: 'Evidence hash', cell: (c) => <Code className="comp-hash">{c.evidence_hash.slice(0, 28)}…</Code>, hideBelow: 'lg' },
+    { key: 'when', header: 'Disposed', sort: (c) => c.disposed_at_utc, cell: (c) => <span className="comp-cell-grey">{dateTime(c.disposed_at_utc)}</span> },
   ]
 
   const allComms = t.data.recallComms
@@ -76,7 +76,7 @@ export function RecallOversight() {
         <Stat label="Disposal certificates" value={num(t.data.disposals.length)} sub="witnessed destructions" icon={Flame} tone="serious" />
       </StatGrid>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-2">
+      <div className="comp-gap-top grid gap-5 xl:grid-cols-2">
         <Card>
           <CardHeader title="Recall notification effectiveness" subtitle="All notices across every recall" />
           <CardBody>
@@ -100,12 +100,12 @@ export function RecallOversight() {
         </Card>
       </div>
 
-      <Card className="mt-5">
+      <Card className="comp-gap-top-2">
         <CardHeader title="Recall ledger" subtitle="reverse_logistics.global_recall_ledger with communication and return outcomes" />
         <DataTable bare rows={m.recalls} columns={cols} rowKey={(x) => x.r.recall_id} loading={t.isLoading} initialSort={{ key: 'id', dir: 'desc' }} emptyTitle="No recalls" />
       </Card>
 
-      <Card className="mt-5">
+      <Card className="comp-gap-top">
         <CardHeader title="Disposal certificates" subtitle="Proof that recalled or damaged stock was destroyed and can never re-enter the market" icon={Flame} />
         <DataTable bare rows={t.data.disposals} columns={certCols} rowKey={(c) => c.certificate_id} loading={t.isLoading} emptyTitle="No certificates" />
       </Card>

@@ -104,7 +104,7 @@ function DispatchModal({ order, items, onClose }: { order: SalesOrder | null; it
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="dist-modal-stack">
         {needsReefer && (
           <Callout tone="info" icon={Snowflake} title="Cold-chain shipment">
             At least one line needs 2–8°C storage. Only refrigerated (Reefer) vehicles can be selected.
@@ -141,17 +141,17 @@ function DispatchModal({ order, items, onClose }: { order: SalesOrder | null; it
           </Field>
         </FormGrid>
         <div>
-          <p className="mb-2 text-[13px] font-medium text-ink">Pick list</p>
-          <div className="space-y-2">
+          <p className="form-label dist-pick-title">Pick list</p>
+          <div className="dist-pick-list">
             {plan.map((p) => (
-              <div key={p.item.order_item_id} className="rounded-xl border border-line px-3 py-2.5">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-[13px]">
-                    <Code>{L.batchNo(p.item.batch_id)}</Code> <span className="text-ink-2">{L.medName(p.item.batch_id)}</span>
+              <div key={p.item.order_item_id} className="dist-pick-item">
+                <div className="dist-pick-top">
+                  <span className="dist-cell-text">
+                    <Code>{L.batchNo(p.item.batch_id)}</Code> <span className="dist-grey">{L.medName(p.item.batch_id)}</span>
                   </span>
-                  <span className="text-[13px] font-semibold text-ink tabular">{num(p.item.quantity)} units</span>
+                  <span className="dist-pick-qty">{num(p.item.quantity)} units</span>
                 </div>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                <div className="dist-pick-tags">
                   {p.draws.map((d) => (
                     <Badge key={d.location_id} tone="info">
                       {num(d.qty)} from {L.locLabel(d.location_id)}
@@ -225,7 +225,7 @@ export function Fulfillment() {
   const actions = (r: Row) => {
     if (r.o.order_status === 'Pending')
       return (
-        <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+        <div className="dist-action-btns" onClick={(e) => e.stopPropagation()}>
           <Button size="xs" variant="success" icon={CheckCircle2} disabled={!r.items.length} loading={busy === `order-${r.o.order_id}`} onClick={() => void setStatus(r.o, 'Approved')} title={!r.items.length ? 'Order has no lines' : undefined}>
             Approve
           </Button>
@@ -256,19 +256,19 @@ export function Fulfillment() {
           )}
         </div>
       )
-    return <span className="text-xs text-muted">{r.o.order_status === 'Shipped' ? 'Awaiting signature' : '—'}</span>
+    return <span className="dist-muted-small">{r.o.order_status === 'Shipped' ? 'Awaiting signature' : '—'}</span>
   }
 
   const cols: Column<Row>[] = [
-    { key: 'id', header: 'Order', sort: (r) => r.o.order_id, cell: (r) => <span className="font-semibold tabular">#{r.o.order_id}</span> },
-    { key: 'buyer', header: 'Retailer', sort: (r) => L.orgName(r.o.buyer_org_id), cell: (r) => <span className="text-[13px]">{L.orgName(r.o.buyer_org_id)}</span> },
-    { key: 'lines', header: 'Lines', align: 'right', sort: (r) => r.items.length, cell: (r) => <span className="text-ink-2">{r.items.length}</span>, hideBelow: 'md' },
+    { key: 'id', header: 'Order', sort: (r) => r.o.order_id, cell: (r) => <span className="dist-bold">#{r.o.order_id}</span> },
+    { key: 'buyer', header: 'Retailer', sort: (r) => L.orgName(r.o.buyer_org_id), cell: (r) => <span className="dist-cell-text">{L.orgName(r.o.buyer_org_id)}</span> },
+    { key: 'lines', header: 'Lines', align: 'right', sort: (r) => r.items.length, cell: (r) => <span className="dist-grey">{r.items.length}</span>, hideBelow: 'md' },
     { key: 'value', header: 'Value', align: 'right', sort: (r) => r.value, cell: (r) => money(r.value) },
     {
       key: 'flags',
       header: 'Checks',
       cell: (r) => (
-        <div className="flex flex-wrap gap-1">
+        <div className="dist-check-tags">
           {r.cold && <Badge tone="info" icon={Snowflake}>Cold</Badge>}
           {['Pending', 'Approved'].includes(r.o.order_status) && (r.items.length === 0 ? <Badge tone="warn">No lines</Badge> : r.covered ? <Badge tone="good" dot>Stock OK</Badge> : <Badge tone="critical" dot>Short</Badge>)}
           {r.overdue && <Badge tone="serious" icon={Clock}>Overdue</Badge>}
@@ -276,8 +276,8 @@ export function Fulfillment() {
       ),
       hideBelow: 'lg',
     },
-    { key: 'expected', header: 'Expected', sort: (r) => r.o.expected_del_date ?? '', cell: (r) => <span className="text-[13px] text-ink-2 tabular">{date(r.o.expected_del_date)}</span>, hideBelow: 'md' },
-    { key: 'status', header: 'Status', sort: (r) => ORDER_FLOW.indexOf(r.o.order_status), cell: (r) => <div className="flex flex-col items-start gap-1"><StatusBadge value={r.o.order_status} meta={ORDER_STATUS} />{r.manifest && r.o.order_status === 'Shipped' && <StatusBadge value={r.manifest.manifest_status} meta={MANIFEST_STATUS} />}</div> },
+    { key: 'expected', header: 'Expected', sort: (r) => r.o.expected_del_date ?? '', cell: (r) => <span className="dist-cell-grey">{date(r.o.expected_del_date)}</span>, hideBelow: 'md' },
+    { key: 'status', header: 'Status', sort: (r) => ORDER_FLOW.indexOf(r.o.order_status), cell: (r) => <div className="dist-status-stack"><StatusBadge value={r.o.order_status} meta={ORDER_STATUS} />{r.manifest && r.o.order_status === 'Shipped' && <StatusBadge value={r.manifest.manifest_status} meta={MANIFEST_STATUS} />}</div> },
     { key: 'act', header: 'Action', cell: actions },
   ]
 
@@ -286,7 +286,7 @@ export function Fulfillment() {
   return (
     <>
       <PageHeader />
-      <div className="mb-4">
+      <div className="dist-filter-row">
         <Segmented<Filter>
           value={filter}
           onChange={setFilter}
@@ -317,48 +317,48 @@ export function Fulfillment() {
 
       <Drawer open={!!open} onClose={() => setOpenId(null)} title={open ? `Order #${open.o.order_id}` : ''} subtitle={open ? `${L.orgName(open.o.buyer_org_id)} · placed ${date(open.o.order_date)}` : ''} actions={open && actions(open)}>
         {open && (
-          <div className="space-y-4">
+          <div className="dist-drawer-stack">
             <Card>
-              <CardBody className="pt-5">
+              <CardBody className="dist-stepper-body">
                 <Stepper steps={ORDER_FLOW} current={open.o.order_status === 'Cancelled' ? 'Pending' : open.o.order_status} failed={open.o.order_status === 'Cancelled'} />
-                {open.o.order_status === 'Cancelled' && <Callout tone="neutral" className="mt-4">This order was cancelled.</Callout>}
+                {open.o.order_status === 'Cancelled' && <Callout tone="neutral" className="dist-cancel-note">This order was cancelled.</Callout>}
               </CardBody>
             </Card>
             <Card>
               <CardHeader title="Order lines" subtitle={`${open.items.length} lines · ${money(open.value)}`} />
-              <div className="divide-y divide-line border-t border-line">
+              <div className="dist-order-lines">
                 {open.items.map((i) => (
-                  <div key={i.order_item_id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+                  <div key={i.order_item_id} className="dist-line-row">
                     <div>
-                      <Code>{L.batchNo(i.batch_id)}</Code> <span className="text-[13px] text-ink-2">{L.medName(i.batch_id)}</span>
-                      {isColdChain(L.pkgOfBatch(i.batch_id)) && <Badge tone="info" icon={Snowflake} className="ml-2">Cold</Badge>}
+                      <Code>{L.batchNo(i.batch_id)}</Code> <span className="dist-cell-grey">{L.medName(i.batch_id)}</span>
+                      {isColdChain(L.pkgOfBatch(i.batch_id)) && <Badge tone="info" icon={Snowflake} className="dist-cold-tag">Cold</Badge>}
                     </div>
-                    <span className="text-[13px] text-ink tabular">
+                    <span className="dist-cell-text">
                       {num(i.quantity)} × {money(i.unit_price)} = <b>{money(i.quantity * Number(i.unit_price))}</b>
                     </span>
                   </div>
                 ))}
-                {open.items.length === 0 && <p className="px-5 py-4 text-[13px] text-ink-2">No lines on this order.</p>}
+                {open.items.length === 0 && <p className="dist-no-lines">No lines on this order.</p>}
               </div>
             </Card>
             {open.manifest && (
               <Card>
                 <CardHeader title="Shipment" icon={Truck} actions={<StatusBadge value={open.manifest.manifest_status} meta={MANIFEST_STATUS} />} />
-                <CardBody className="grid grid-cols-2 gap-3 text-[13px]">
-                  <div><p className="text-muted">Vehicle</p><p className="text-ink">{L.vehicle.get(open.manifest.vehicle_id)?.vehicle_no} ({L.vehicle.get(open.manifest.vehicle_id)?.vehicle_type})</p></div>
-                  <div><p className="text-muted">Driver</p><p className="text-ink">{L.userName(open.manifest.driver_user_id)}</p></div>
-                  <div><p className="text-muted">Dispatched</p><p className="text-ink">{dateTime(open.manifest.dispatch_time_utc)}</p></div>
-                  <div><p className="text-muted">ETA</p><p className="text-ink">{open.manifest.estimated_arrival_time ? `${dateTime(open.manifest.estimated_arrival_time)} (${relative(open.manifest.estimated_arrival_time)})` : '—'}</p></div>
+                <CardBody className="dist-ship-grid">
+                  <div><p className="dist-ship-label">Vehicle</p><p className="dist-ship-value">{L.vehicle.get(open.manifest.vehicle_id)?.vehicle_no} ({L.vehicle.get(open.manifest.vehicle_id)?.vehicle_type})</p></div>
+                  <div><p className="dist-ship-label">Driver</p><p className="dist-ship-value">{L.userName(open.manifest.driver_user_id)}</p></div>
+                  <div><p className="dist-ship-label">Dispatched</p><p className="dist-ship-value">{dateTime(open.manifest.dispatch_time_utc)}</p></div>
+                  <div><p className="dist-ship-label">ETA</p><p className="dist-ship-value">{open.manifest.estimated_arrival_time ? `${dateTime(open.manifest.estimated_arrival_time)} (${relative(open.manifest.estimated_arrival_time)})` : '—'}</p></div>
                 </CardBody>
               </Card>
             )}
             {open.receipt && (
               <Card>
                 <CardHeader title="Proof of delivery" icon={PackageCheck} actions={<Badge tone={open.receipt.received_condition === 'Good' ? 'good' : 'serious'}>{open.receipt.received_condition}</Badge>} />
-                <CardBody className="space-y-1 text-[13px]">
-                  <p className="text-ink">Signed by {L.userName(open.receipt.received_by_user_id)} · {dateTime(open.receipt.delivery_time)}</p>
-                  {open.receipt.remarks && <p className="text-ink-2">“{open.receipt.remarks}”</p>}
-                  <p className="font-mono text-xs break-all text-muted">{open.receipt.digital_signature}</p>
+                <CardBody className="dist-pod-body">
+                  <p className="dist-ship-value">Signed by {L.userName(open.receipt.received_by_user_id)} · {dateTime(open.receipt.delivery_time)}</p>
+                  {open.receipt.remarks && <p className="dist-grey">“{open.receipt.remarks}”</p>}
+                  <p className="dist-signature">{open.receipt.digital_signature}</p>
                 </CardBody>
               </Card>
             )}

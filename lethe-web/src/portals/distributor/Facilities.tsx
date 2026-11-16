@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Building2, MapPin, Plus, Snowflake, Sun } from 'lucide-react'
+import { MapPin, Plus, Snowflake, Sun } from 'lucide-react'
 import { useProfile } from '@/auth/AuthProvider'
 import { logEvent, mustChange, useRunner } from '@/data/actions'
 import { useLookups, useTables } from '@/data/hooks'
@@ -129,17 +129,17 @@ export function Facilities() {
     )
 
   const cols: Column<LocationView>[] = [
-    { key: 'id', header: 'Location', sort: (v) => v.loc.location_id, cell: (v) => <span className="inline-flex items-center gap-1.5 font-medium">{v.loc.zone_type === 'Cold Storage' ? <Snowflake className="size-4 text-info-text" /> : <Sun className="size-4 text-warn-text" />}L{v.loc.location_id}</span> },
-    { key: 'wh', header: 'Warehouse', sort: (v) => v.wh?.warehouse_name ?? '', cell: (v) => <span className="text-[13px]">{v.wh?.warehouse_name}</span> },
+    { key: 'id', header: 'Location', sort: (v) => v.loc.location_id, cell: (v) => <span className="dist-loc-id">{v.loc.zone_type === 'Cold Storage' ? <Snowflake className="dist-zone-icon dist-icon-cold" /> : <Sun className="dist-zone-icon dist-icon-warm" />}L{v.loc.location_id}</span> },
+    { key: 'wh', header: 'Warehouse', sort: (v) => v.wh?.warehouse_name ?? '', cell: (v) => <span className="dist-cell-text">{v.wh?.warehouse_name}</span> },
     { key: 'zone', header: 'Zone', sort: (v) => v.loc.zone_type, cell: (v) => <Badge tone={v.loc.zone_type === 'Cold Storage' ? 'info' : 'neutral'}>{v.loc.zone_type}</Badge>, hideBelow: 'md' },
-    { key: 'band', header: 'Target band', cell: (v) => <span className="text-[13px] text-ink-2 tabular">{v.loc.target_min_temp}–{v.loc.target_max_temp}°C · ≤{v.loc.target_humidity_limit}% RH</span>, hideBelow: 'lg' },
+    { key: 'band', header: 'Target band', cell: (v) => <span className="dist-cell-grey">{v.loc.target_min_temp}–{v.loc.target_max_temp}°C · ≤{v.loc.target_humidity_limit}% RH</span>, hideBelow: 'lg' },
     {
       key: 'use',
       header: 'Utilisation',
       sort: (v) => v.utilisation,
       cell: (v) => (
-        <div className="w-36">
-          <div className="mb-1 flex justify-between text-xs text-ink-2 tabular">
+        <div className="dist-use-cell">
+          <div className="dist-use-nums">
             <span>{num(v.stock)}</span>
             <span>{num(v.loc.max_capacity)}</span>
           </div>
@@ -157,27 +157,22 @@ export function Facilities() {
   return (
     <>
       <PageHeader actions={<Button variant="primary" icon={Plus} onClick={() => setAdding(true)}>Add location</Button>} />
-      <Callout tone="info" className="mb-5" title="Safety locks enforced by the database">
+      <Callout tone="info" className="dist-lock-note" title="Safety locks enforced by the database">
         A location still holding stock cannot be deactivated, and a warehouse cannot be shut while it has active locations. Try it: the trigger will refuse and explain why.
       </Callout>
       <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
         {m.warehouses.map((w) => (
-          <Card key={w.w.warehouse_id} className="p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <span className="grid size-9 place-items-center rounded-xl bg-accent-soft text-accent-text">
-                  <Building2 className="size-[18px]" />
-                </span>
-                <div>
-                  <p className="text-[14.5px] font-semibold text-ink">{w.w.warehouse_name}</p>
-                  <p className="text-[12.5px] text-ink-2">
-                    {w.w.city}, {w.w.state} · {L.userName(w.w.manager_user_id)}
-                  </p>
-                </div>
+          <Card key={w.w.warehouse_id} className="dist-fac-box">
+            <div className="dist-fac-top">
+              <div>
+                <p className="dist-fac-name">{w.w.warehouse_name}</p>
+                <p className="dist-wh-city">
+                  {w.w.city}, {w.w.state} · {L.userName(w.w.manager_user_id)}
+                </p>
               </div>
               <Switch checked={w.w.is_active} disabled={busy === `wh-${w.w.warehouse_id}`} onChange={(v) => void toggleWarehouse(w.w.warehouse_id, w.w.warehouse_name, v)} label={`Toggle ${w.w.warehouse_name}`} />
             </div>
-            <div className="mt-3 flex flex-wrap gap-1.5 text-xs">
+            <div className="dist-tag-row">
               <Badge tone={w.w.is_active ? 'good' : 'neutral'} dot>
                 {w.w.is_active ? 'Operational' : 'Shut'}
               </Badge>
@@ -187,7 +182,7 @@ export function Facilities() {
           </Card>
         ))}
       </div>
-      <Card className="mt-5">
+      <Card className="dist-card-gap">
         <CardHeader title="Storage locations" subtitle="smart_warehousing.storage_location" />
         <DataTable bare rows={m.locations} columns={cols} rowKey={(v) => v.loc.location_id} loading={m.isLoading} searchText={(v) => `L${v.loc.location_id} ${v.wh?.warehouse_name} ${v.loc.zone_type}`} initialSort={{ key: 'id', dir: 'asc' }} pageSize={12} />
       </Card>

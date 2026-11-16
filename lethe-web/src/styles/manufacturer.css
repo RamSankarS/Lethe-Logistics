@@ -1,0 +1,939 @@
+/* =========================================================
+   manufacturer portal styles
+   ========================================================= */
+
+/* only for the manufacturer pages (overview, batches, catalog,
+   recalls, returns, revenue). everything starts with mfr- so it
+   doesn't mess up the other portals. the grids are still tailwind. */
+
+/* ---------- bits used on more than one page ---------- */
+
+.mfr-grey-text {
+  color: #666666;
+}
+
+/* bold word inside the "are you sure?" popups */
+.mfr-strong {
+  font-weight: bold;
+  color: #000000;
+}
+
+/* table / trigger names inside the grey info boxes */
+.mfr-code {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
+  font-weight: bold;
+  word-break: break-all; /* long names went outside the box on my phone */
+}
+
+/* filter buttons + the help text next to them */
+.mfr-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.mfr-hint-text {
+  font-size: 13px;
+  color: #666666;
+  margin: 0;
+}
+
+/* things inside the popups, one under the other */
+.mfr-stack > * {
+  margin-bottom: 15px;
+}
+
+.mfr-stack > *:last-child {
+  margin-bottom: 0;
+}
+
+/* small grey line under the main value in a table cell */
+.mfr-cell-sub {
+  font-size: 12px;
+  color: #666666;
+  margin: 2px 0 0 0;
+}
+
+.mfr-cell-muted {
+  font-size: 12px;
+  color: #888888;
+  font-style: italic;
+}
+
+.mfr-cell-text {
+  font-size: 13px;
+}
+
+.mfr-date-text {
+  font-size: 13px;
+  color: #555555;
+  white-space: nowrap;
+}
+
+.mfr-red-num {
+  color: #DC3545;
+}
+
+.mfr-orange-num {
+  color: #E8690B;
+}
+
+/* ---------- QC buttons (used in overview, batches table and the side panel) ---------- */
+
+.mfr-locked-text {
+  font-size: 12px;
+  color: #888888;
+  font-style: italic;
+}
+
+.mfr-qc-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+/* reject = red text. needs !important, btn-plain kept making it blue */
+.mfr-reject-btn {
+  color: #DC3545 !important;
+}
+
+.mfr-reject-btn:hover {
+  background-color: #F8D7DA !important;
+  text-decoration: none !important;
+}
+
+/* release popup checklist */
+.mfr-checklist > * {
+  margin-bottom: 11px;
+}
+
+.mfr-checklist > *:last-child {
+  margin-bottom: 0;
+}
+
+.mfr-checklist-note {
+  margin-top: 17px;
+}
+
+/* ---------- overview page ---------- */
+
+.mfr-expired-alert {
+  margin-bottom: 18px;
+}
+
+.mfr-expired-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-top: 8px;
+}
+
+.mfr-expired-item {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  background-color: #FFFFFF;
+  border: 1px solid #F1AEB5;
+  border-radius: 3px;
+  padding: 3px 7px 3px 5px;
+}
+
+/* the two rows of boxes under the numbers */
+.mfr-row-1 {
+  margin-top: 18px;
+}
+
+.mfr-row-2 {
+  margin-top: 23px;
+}
+
+/* one small box for each batch status (under the coloured bar) */
+.mfr-status-boxes {
+  margin-top: 16px;
+}
+
+.mfr-status-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background-color: #FFFFFF;
+  border: 1px solid #DDDDDD;
+  padding: 8px 10px 9px 10px;
+}
+
+/* was touching the box next to it on my laptop */
+.mfr-status-box:nth-child(odd) {
+  margin-right: 2px;
+}
+
+.mfr-status-box .color-square {
+  flex-shrink: 0;
+  margin-top: 3px; /* lines it up with the text */
+}
+
+.mfr-status-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+}
+
+.mfr-status-hint {
+  font-size: 12px;
+  color: #666666;
+  margin: 2px 0 0 0;
+}
+
+/* card body with no side padding so the lines go from edge to edge */
+.mfr-list-body {
+  padding: 0 0 6px 0 !important;
+}
+
+.mfr-expiry-list {
+  font-size: 14px;
+}
+
+.mfr-expiry-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 15px 7px 14px;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.mfr-expiry-row:nth-child(even) {
+  background-color: #FFFFFF;
+}
+
+.mfr-expiry-row:last-child {
+  border-bottom: none;
+}
+
+.mfr-expiry-med {
+  margin-left: 7px;
+  font-size: 13px;
+  color: #555555;
+}
+
+.mfr-expiry-tags {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* recent events list */
+.mfr-event-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mfr-event-item {
+  padding: 8px 15px 7px 15px;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.mfr-event-item:last-child {
+  border-bottom: none;
+}
+
+.mfr-event-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* cuts long text with ... (found this on stackoverflow) */
+.mfr-event-name,
+.mfr-event-sub {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mfr-event-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+}
+
+.mfr-event-sub {
+  font-size: 12px;
+  color: #777777;
+  margin: 3px 0 0 0;
+}
+
+/* ---------- batches page ---------- */
+
+.mfr-batch-input {
+  font-family: "Courier New", Courier, monospace !important;
+}
+
+.mfr-storage-note {
+  margin-top: 18px;
+}
+
+/* ---------- catalog page ---------- */
+
+/* add medicine popup */
+.mfr-med-form section {
+  margin-bottom: 22px;
+}
+
+.mfr-med-form section:last-child {
+  margin-bottom: 0;
+}
+
+.mfr-section-label {
+  font-size: 15px;
+  font-weight: bold;
+  color: #333333;
+  margin: 0 0 10px 0;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.mfr-cold-note {
+  margin-top: 12px;
+}
+
+/* one box per medicine */
+.mfr-med-card {
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* discontinued ones are faded out */
+.mfr-med-off {
+  opacity: 0.65;
+}
+
+.mfr-med-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px 0 15px;
+}
+
+.mfr-med-title-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.mfr-med-name {
+  font-size: 17px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mfr-med-generic {
+  font-size: 13px;
+  color: #555555;
+  margin: 3px 0 0 0;
+}
+
+.mfr-switch-area {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-top: 2px;
+  flex-shrink: 0; /* had to add this or the ON/OFF button gets squashed */
+}
+
+.mfr-switch-label {
+  font-size: 12px;
+  color: #777777;
+}
+
+/* the 3 lines: composition / storage / qc spec */
+.mfr-med-info {
+  margin: 11px 16px 14px 15px;
+  background-color: #FFFFFF;
+  border: 1px solid #DDDDDD;
+  font-size: 13px;
+  line-height: normal;
+}
+
+.mfr-med-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 6px 8px;
+  border-bottom: 1px solid lightgray;
+}
+
+.mfr-med-info-row:last-child {
+  border-bottom: none;
+}
+
+.mfr-med-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #666666;
+}
+
+.mfr-med-info-text {
+  color: #333333;
+}
+
+.mfr-med-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 15px 8px 14px;
+  border-top: 1px solid #CCCCCC;
+  border-radius: 0 0 3px 3px; /* corners stuck out without this */
+  background-color: #EAEAEA;
+  font-size: 13px;
+  color: #555555;
+}
+
+.mfr-med-count {
+  color: #000000;
+}
+
+/* ---------- recalls page ---------- */
+
+/* Class I / II / III picker in the recall popup */
+.mfr-class-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FFFFFF;
+  border: 1px solid #AAAAAA;
+  border-radius: 3px;
+  padding: 8px 10px 9px 10px;
+  cursor: pointer;
+}
+
+.mfr-class-btn:hover {
+  background-color: #EEEEEE;
+}
+
+.mfr-class-btn-on,
+.mfr-class-btn-on:hover {
+  background-color: #F8D7DA;
+  border-color: #DC3545;
+}
+
+.mfr-class-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+}
+
+.mfr-class-name-on {
+  color: #B02A37;
+}
+
+.mfr-class-hint {
+  font-size: 12px;
+  color: #555555;
+  margin: 3px 0 0 0;
+}
+
+.mfr-channel-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+
+.mfr-recip-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #222222;
+  margin: 0 0 6px 0;
+}
+
+.mfr-recip-title .mfr-grey-text {
+  font-weight: normal;
+}
+
+.mfr-recip-box {
+  max-height: 190px;
+  overflow-y: auto;
+  background-color: #FFFFFF;
+  border: 1px solid #999999;
+}
+
+.mfr-recip-empty {
+  margin: 0;
+  padding: 8px;
+  font-size: 13px;
+  color: #666666;
+}
+
+.mfr-recip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 8px 6px 8px;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.mfr-recip-row:last-child {
+  border-bottom: none;
+}
+
+.mfr-recip-row:hover {
+  background-color: #FFFFCC;
+}
+
+/* one box per recall */
+.mfr-recall-list {
+  margin-top: 20px;
+}
+
+.mfr-recall-list > * {
+  margin-bottom: 16px;
+}
+
+.mfr-recall-list > *:last-child {
+  margin-bottom: 0;
+}
+
+.mfr-recall-body {
+  padding-top: 15px;
+}
+
+.mfr-recall-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mfr-recall-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.mfr-recall-id {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+}
+
+.mfr-recall-med {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  color: #000000;
+  margin: 9px 0 0 0;
+}
+
+.mfr-recall-reason {
+  max-width: 760px;
+  font-size: 14px;
+  line-height: normal;
+  color: #333333;
+  margin: 5px 0 0 0;
+}
+
+.mfr-recall-meta {
+  font-size: 12px;
+  color: #777777;
+  margin: 4px 0 0 0;
+}
+
+.mfr-recall-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mfr-recall-grid {
+  margin-top: 18px;
+}
+
+/* used to be tiny capital letters, normal bold is easier to read */
+.mfr-sub-heading {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333333;
+  margin: 0 0 7px 0;
+}
+
+/* the 3 small number boxes on the right */
+.mfr-mini-stat {
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  padding: 6px 9px 7px 11px;
+}
+
+.mfr-mini-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #555555;
+  margin: 0;
+}
+
+.mfr-mini-number {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000000;
+  margin: 2px 0 0 0;
+}
+
+.mfr-mini-small {
+  font-size: 12px;
+  font-weight: normal;
+  color: #666666;
+}
+
+/* "show notices by organisation" */
+.mfr-notice-details {
+  margin-top: 16px;
+}
+
+.mfr-notice-summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: #0066CC;
+  text-decoration: underline;
+}
+
+.mfr-notice-grid {
+  margin-top: 10px;
+}
+
+.mfr-notice-box {
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  padding: 7px 10px 8px 10px;
+}
+
+.mfr-notice-org {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+}
+
+.mfr-notice-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+/* ---------- returns page ---------- */
+
+.mfr-dispo-list {
+  display: grid;
+  gap: 7px;
+}
+
+/* the disposition options (made them look like radio buttons) */
+.mfr-dispo-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FFFFFF;
+  border: 1px solid #AAAAAA;
+  border-radius: 3px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.mfr-dispo-btn:hover {
+  background-color: #EEEEEE;
+}
+
+.mfr-dispo-btn-on,
+.mfr-dispo-btn-on:hover {
+  background-color: #DDEEFF;
+  border-color: #0066CC;
+}
+
+.mfr-fake-radio {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+  background-color: #FFFFFF;
+  border: 1px solid #777777;
+  border-radius: 50%;
+}
+
+.mfr-fake-radio-on {
+  border-color: #0066CC;
+}
+
+/* dot in the middle. position absolute because I couldn't center it any other way */
+.mfr-fake-radio-dot {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #0066CC;
+}
+
+.mfr-dispo-name {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+}
+
+.mfr-dispo-hint {
+  display: block;
+  font-size: 12px;
+  color: #555555;
+  margin-top: 1px;
+}
+
+.mfr-hash-input {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+}
+
+.mfr-return-id {
+  font-weight: bold;
+  color: #000000;
+}
+
+.mfr-reason-cell {
+  max-width: 240px;
+}
+
+.mfr-reason-text {
+  font-size: 13px;
+  color: #555555;
+  margin: 0 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mfr-outcome-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.mfr-done-text {
+  font-size: 12px;
+  font-weight: bold;
+  color: #28A745;
+}
+
+.mfr-returns-card {
+  margin-top: 19px;
+}
+
+.mfr-returns-filter {
+  padding: 0 15px 12px 14px;
+}
+
+/* ---------- revenue page ---------- */
+
+.mfr-revenue-row {
+  margin-top: 20px;
+}
+
+.mfr-profit-card {
+  margin-top: 18px;
+}
+
+.mfr-ledger-card {
+  margin-top: 21px;
+}
+
+.mfr-revenue-note {
+  margin-top: 20px;
+}
+
+.mfr-net-num,
+.mfr-total-num {
+  font-weight: bold;
+}
+
+.mfr-order-no {
+  white-space: nowrap;
+}
+
+/* =========================================================
+   night mode for the manufacturer pages
+   ========================================================= */
+
+/* boxes */
+[data-theme="dark"] .mfr-expired-item {
+  background-color: #2B2B2B !important;
+  border-color: #555555 !important;
+}
+
+[data-theme="dark"] .mfr-status-box,
+[data-theme="dark"] .mfr-med-info,
+[data-theme="dark"] .mfr-recip-box,
+[data-theme="dark"] .mfr-mini-stat,
+[data-theme="dark"] .mfr-notice-box {
+  background-color: #333333 !important;
+  border-color: #555555 !important;
+  color: #E6E6E6;
+}
+
+[data-theme="dark"] .mfr-med-footer {
+  background-color: #333333;
+  border-color: #555555;
+  color: #B5B5B5;
+}
+
+/* lines between rows */
+[data-theme="dark"] .mfr-expiry-row,
+[data-theme="dark"] .mfr-event-item,
+[data-theme="dark"] .mfr-med-info-row,
+[data-theme="dark"] .mfr-recip-row,
+[data-theme="dark"] .mfr-section-label {
+  border-color: #555555;
+}
+
+[data-theme="dark"] .mfr-expiry-row:nth-child(even) {
+  background-color: #333333;
+}
+
+[data-theme="dark"] .mfr-recip-row:hover {
+  background-color: #4A4A2A;
+}
+
+/* the picker buttons (no !important here or the hover stops working) */
+[data-theme="dark"] .mfr-class-btn,
+[data-theme="dark"] .mfr-dispo-btn {
+  background-color: #333333;
+  border-color: #666666;
+  color: #E6E6E6;
+}
+
+[data-theme="dark"] .mfr-class-btn:hover,
+[data-theme="dark"] .mfr-dispo-btn:hover {
+  background-color: #444444;
+}
+
+[data-theme="dark"] .mfr-class-btn-on,
+[data-theme="dark"] .mfr-class-btn-on:hover {
+  background-color: #4D1C21;
+  border-color: #DC3545;
+}
+
+[data-theme="dark"] .mfr-dispo-btn-on,
+[data-theme="dark"] .mfr-dispo-btn-on:hover {
+  background-color: #1F3A57;
+  border-color: #3399FF;
+}
+
+[data-theme="dark"] .mfr-fake-radio {
+  background-color: #1E1E1E;
+  border-color: #888888;
+}
+
+[data-theme="dark"] .mfr-fake-radio-on {
+  border-color: #3399FF;
+}
+
+[data-theme="dark"] .mfr-fake-radio-dot {
+  background-color: #3399FF;
+}
+
+/* white-ish text */
+[data-theme="dark"] .mfr-strong,
+[data-theme="dark"] .mfr-status-name,
+[data-theme="dark"] .mfr-event-name,
+[data-theme="dark"] .mfr-section-label,
+[data-theme="dark"] .mfr-med-name,
+[data-theme="dark"] .mfr-med-info-text,
+[data-theme="dark"] .mfr-med-count,
+[data-theme="dark"] .mfr-class-name,
+[data-theme="dark"] .mfr-recip-title,
+[data-theme="dark"] .mfr-recall-id,
+[data-theme="dark"] .mfr-recall-med,
+[data-theme="dark"] .mfr-recall-reason,
+[data-theme="dark"] .mfr-sub-heading,
+[data-theme="dark"] .mfr-mini-number,
+[data-theme="dark"] .mfr-notice-org,
+[data-theme="dark"] .mfr-dispo-name,
+[data-theme="dark"] .mfr-return-id {
+  color: #E6E6E6;
+}
+
+/* grey text was too dark on the black background */
+[data-theme="dark"] .mfr-grey-text,
+[data-theme="dark"] .mfr-hint-text,
+[data-theme="dark"] .mfr-cell-sub,
+[data-theme="dark"] .mfr-cell-muted,
+[data-theme="dark"] .mfr-date-text,
+[data-theme="dark"] .mfr-locked-text,
+[data-theme="dark"] .mfr-status-hint,
+[data-theme="dark"] .mfr-expiry-med,
+[data-theme="dark"] .mfr-event-sub,
+[data-theme="dark"] .mfr-med-generic,
+[data-theme="dark"] .mfr-switch-label,
+[data-theme="dark"] .mfr-med-icon,
+[data-theme="dark"] .mfr-class-hint,
+[data-theme="dark"] .mfr-recip-empty,
+[data-theme="dark"] .mfr-recall-meta,
+[data-theme="dark"] .mfr-mini-label,
+[data-theme="dark"] .mfr-mini-small,
+[data-theme="dark"] .mfr-dispo-hint,
+[data-theme="dark"] .mfr-reason-text {
+  color: #B5B5B5;
+}
+
+/* coloured text */
+[data-theme="dark"] .mfr-red-num,
+[data-theme="dark"] .mfr-class-name-on {
+  color: #FF7B86;
+}
+
+[data-theme="dark"] .mfr-orange-num {
+  color: #FFA552;
+}
+
+[data-theme="dark"] .mfr-done-text {
+  color: #5CD67A;
+}
+
+[data-theme="dark"] .mfr-notice-summary {
+  color: #66B2FF;
+}
+
+[data-theme="dark"] .mfr-reject-btn {
+  color: #FF7B86 !important;
+}
+
+[data-theme="dark"] .mfr-reject-btn:hover {
+  background-color: #4D1C21 !important;
+}

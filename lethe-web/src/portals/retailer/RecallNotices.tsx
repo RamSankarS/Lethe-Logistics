@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BellRing, CheckCircle2, ShieldCheck, Siren, Undo2 } from 'lucide-react'
+import { BellRing, CheckCircle2, ShieldCheck, Undo2 } from 'lucide-react'
 import { useProfile } from '@/auth/AuthProvider'
 import { logEvent, mustChange, useRunner } from '@/data/actions'
 import { useLookups } from '@/data/hooks'
@@ -46,7 +46,7 @@ export function RecallNotices() {
           </EmptyState>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="retailer-recall-list">
           {cards.map((rc) => {
             const mine = m.notices.filter((n) => n.recall_id === rc.recall_id)
             const acked = mine.some((n) => n.delivery_status === 'Read')
@@ -54,24 +54,19 @@ export function RecallNotices() {
             const filed = m.returns.filter((x) => x.r.batch_id === rc.batch_id).reduce((s, x) => s + x.r.quantity_returned, 0)
             const outstanding = Math.max(0, (held?.qty ?? 0) - filed)
             return (
-              <Card key={rc.recall_id} className={rc.quarantine_status === 'Active' ? 'border-critical/40' : ''}>
-                <CardBody className="pt-5">
+              <Card key={rc.recall_id} className={rc.quarantine_status === 'Active' ? 'retailer-recall-active' : ''}>
+                <CardBody className="retailer-recall-body">
                   <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="flex min-w-0 items-start gap-3">
-                      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-critical-soft text-critical-text">
-                        <Siren className="size-5" />
-                      </span>
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-[15px] font-semibold text-ink">{L.medName(rc.batch_id)}</p>
-                          <Code>{L.batchNo(rc.batch_id)}</Code>
-                          <StatusBadge value={rc.quarantine_status} meta={RECALL_STATUS} />
-                        </div>
-                        <p className="mt-1 text-[13px] leading-5 text-ink-2">{rc.recall_reason}</p>
-                        <p className="mt-1 text-xs text-muted">
-                          Recall #{rc.recall_id} by {L.orgName(rc.initiated_by_org_id)} · {dateTime(rc.created_at_utc)} ({relative(rc.created_at_utc)})
-                        </p>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="retailer-recall-med">{L.medName(rc.batch_id)}</p>
+                        <Code>{L.batchNo(rc.batch_id)}</Code>
+                        <StatusBadge value={rc.quarantine_status} meta={RECALL_STATUS} />
                       </div>
+                      <p className="retailer-recall-reason">{rc.recall_reason}</p>
+                      <p className="retailer-recall-meta">
+                        Recall #{rc.recall_id} by {L.orgName(rc.initiated_by_org_id)} · {dateTime(rc.created_at_utc)} ({relative(rc.created_at_utc)})
+                      </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {mine.length > 0 &&
@@ -92,20 +87,20 @@ export function RecallNotices() {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid gap-3 md:grid-cols-3">
-                    <div className="rounded-xl bg-surface-2 px-3 py-2.5">
-                      <p className="text-[11.5px] text-muted">Units you received</p>
-                      <p className="text-[15px] font-semibold text-ink tabular">{num(held?.qty ?? 0)}</p>
-                      <p className="text-xs text-ink-2">{held ? `orders ${held.orders.map((o) => `#${o}`).join(', ')}` : 'not in your deliveries'}</p>
+                  <div className="retailer-recall-facts grid gap-3 md:grid-cols-3">
+                    <div className="retailer-fact-box">
+                      <p className="retailer-fact-label">Units you received</p>
+                      <p className="retailer-fact-num">{num(held?.qty ?? 0)}</p>
+                      <p className="retailer-fact-sub">{held ? `orders ${held.orders.map((o) => `#${o}`).join(', ')}` : 'not in your deliveries'}</p>
                     </div>
-                    <div className="rounded-xl bg-surface-2 px-3 py-2.5">
-                      <p className="text-[11.5px] text-muted">Already returned</p>
-                      <p className="text-[15px] font-semibold text-ink tabular">{num(filed)}</p>
+                    <div className="retailer-fact-box">
+                      <p className="retailer-fact-label">Already returned</p>
+                      <p className="retailer-fact-num">{num(filed)}</p>
                     </div>
-                    <div className="rounded-xl bg-surface-2 px-3 py-2.5">
-                      <p className="text-[11.5px] text-muted">Notices to you</p>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {mine.length === 0 && <span className="text-xs text-ink-2">Network-wide notice</span>}
+                    <div className="retailer-fact-box">
+                      <p className="retailer-fact-label">Notices to you</p>
+                      <div className="retailer-fact-tags">
+                        {mine.length === 0 && <span className="retailer-fact-sub">Network-wide notice</span>}
                         {mine.map((n) => (
                           <Badge key={n.log_id} tone={COMM_STATUS[n.delivery_status].tone} dot>
                             {humanize(n.channel)}

@@ -130,30 +130,30 @@ export function SystemHealth() {
         <Stat label="Ledger events" value={num(audit.data?.length ?? 0)} sub="immutable audit rows" icon={ScrollText} tone="accent" loading={audit.isLoading} />
       </StatGrid>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-5">
+      <div className="admin-health-grid grid gap-5 xl:grid-cols-5">
         <Card className="xl:col-span-3">
           <CardHeader title="Data volume by schema" subtitle={`${num(totalRows)} rows across ${counts.data?.length ?? 0} tables and views`} icon={Database} />
           <CardBody className="grid gap-5 md:grid-cols-2">
             {(Object.keys(SCHEMAS) as SchemaKey[]).map((s) => (
               <div key={s}>
-                <p className="mb-2 text-[12px] font-semibold tracking-wide text-muted uppercase">
-                  {SCHEMA_LABEL[s]} <span className="font-mono normal-case">· {SCHEMAS[s]}</span>
+                <p className="admin-schema-title">
+                  {SCHEMA_LABEL[s]} <span className="admin-schema-name">· {SCHEMAS[s]}</span>
                 </p>
-                <div className="space-y-1.5">
+                <div className="admin-count-list">
                   {(grouped.get(s) ?? []).map((r) => (
-                    <div key={r.table} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-0.5">
-                      <span className="truncate font-mono text-[12px] text-ink-2">{r.table}</span>
-                      <span className="text-right text-[12px] font-semibold text-ink tabular">{r.count == null ? 'n/a' : num(r.count)}</span>
-                      <Meter className="col-span-2 h-1.5" value={r.count ?? 0} max={maxCount} tone="info" />
+                    <div key={r.table} className="admin-count-row">
+                      <span className="admin-table-name">{r.table}</span>
+                      <span className="admin-count-num">{r.count == null ? 'n/a' : num(r.count)}</span>
+                      <Meter className="admin-count-meter" value={r.count ?? 0} max={maxCount} tone="info" />
                     </div>
                   ))}
-                  {counts.isLoading && <p className="text-xs text-muted">Counting…</p>}
+                  {counts.isLoading && <p className="admin-small-grey">Counting…</p>}
                 </div>
               </div>
             ))}
           </CardBody>
         </Card>
-        <div className="space-y-5 xl:col-span-2">
+        <div className="admin-side-col xl:col-span-2">
           <Card>
             <CardHeader title="Sign-ins per day" subtitle="USER_LOGIN_SUCCESS events from the ledger" />
             <CardBody>
@@ -162,7 +162,7 @@ export function SystemHealth() {
           </Card>
           <Card>
             <CardHeader title="Stack" icon={Cpu} />
-            <CardBody className="space-y-2 text-[13px]">
+            <CardBody className="admin-stack-body">
               {[
                 ['Frontend', 'React 19 · Vite · TypeScript · Tailwind CSS'],
                 ['Data access', 'supabase-js → PostgREST (6 exposed schemas)'],
@@ -170,9 +170,9 @@ export function SystemHealth() {
                 ['Auth', 'Supabase Auth, mapped to identity_mod.users'],
                 ['Governance', '20 triggers, 3 analytic views, 1 stored procedure'],
               ].map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3">
-                  <span className="text-ink-2">{k}</span>
-                  <span className="text-right font-medium text-ink">{v}</span>
+                <div key={k} className="admin-stack-row">
+                  <span className="admin-stack-key">{k}</span>
+                  <span className="admin-stack-val">{v}</span>
                 </div>
               ))}
             </CardBody>
@@ -180,27 +180,27 @@ export function SystemHealth() {
         </div>
       </div>
 
-      <Card className="mt-5">
+      <Card className="admin-trigger-box">
         <CardHeader title="Database automation" subtitle="Business rules enforced inside PostgreSQL, so no client can bypass them" icon={Zap} actions={<Badge tone="good" icon={ShieldCheck}>{TRIGGERS.length} triggers</Badge>} />
-        <div className="overflow-x-auto border-t border-line">
-          <table className="w-full min-w-[720px] text-left text-[13px]">
+        <div className="admin-table-holder">
+          <table className="my-table admin-trigger-table">
             <thead>
-              <tr className="bg-surface-2 text-[11.5px] tracking-wide text-muted uppercase">
-                <th className="px-5 py-2.5 font-semibold">Trigger</th>
-                <th className="px-5 py-2.5 font-semibold">Table</th>
-                <th className="px-5 py-2.5 font-semibold">Fires</th>
-                <th className="px-5 py-2.5 font-semibold">Effect</th>
+              <tr>
+                <th>Trigger</th>
+                <th>Table</th>
+                <th>Fires</th>
+                <th>Effect</th>
               </tr>
             </thead>
             <tbody>
               {TRIGGERS.map((tr) => (
-                <tr key={tr.name} className="border-t border-line">
-                  <td className="px-5 py-2.5">
+                <tr key={tr.name}>
+                  <td>
                     <Code>{tr.name}</Code>
                   </td>
-                  <td className="px-5 py-2.5 font-mono text-[12px] text-ink-2">{tr.table}</td>
-                  <td className="px-5 py-2.5 whitespace-nowrap text-ink-2">{tr.when}</td>
-                  <td className="px-5 py-2.5 text-ink">{tr.does}</td>
+                  <td className="admin-mono-cell">{tr.table}</td>
+                  <td className="admin-nowrap-cell">{tr.when}</td>
+                  <td>{tr.does}</td>
                 </tr>
               ))}
             </tbody>

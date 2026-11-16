@@ -53,19 +53,19 @@ export function ColdChainViolations() {
   }, [t.data, L])
 
   const cols: Column<BreachRow>[] = [
-    { key: 'when', header: 'Recorded', sort: (b) => b.s.recorded_at, cell: (b) => <span className="text-[13px] text-ink-2 tabular">{dateTime(b.s.recorded_at)}</span> },
-    { key: 'loc', header: 'Location', sort: (b) => L.locLabel(b.loc.location_id), cell: (b) => <span className="text-[13px]">{L.locLabel(b.loc.location_id)}</span> },
-    { key: 'reading', header: 'Reading', align: 'right', sort: (b) => b.s.temperature_celsius, cell: (b) => <span className="font-semibold text-critical-text">{temp(b.s.temperature_celsius)}</span> },
-    { key: 'band', header: 'Target', cell: (b) => <span className="text-[13px] text-ink-2 tabular">{b.loc.target_min_temp}–{b.loc.target_max_temp}°C</span>, hideBelow: 'md' },
+    { key: 'when', header: 'Recorded', sort: (b) => b.s.recorded_at, cell: (b) => <span className="comp-cell-grey">{dateTime(b.s.recorded_at)}</span> },
+    { key: 'loc', header: 'Location', sort: (b) => L.locLabel(b.loc.location_id), cell: (b) => <span className="comp-cell-small">{L.locLabel(b.loc.location_id)}</span> },
+    { key: 'reading', header: 'Reading', align: 'right', sort: (b) => b.s.temperature_celsius, cell: (b) => <span className="comp-bad-num">{temp(b.s.temperature_celsius)}</span> },
+    { key: 'band', header: 'Target', cell: (b) => <span className="comp-cell-grey">{b.loc.target_min_temp}–{b.loc.target_max_temp}°C</span>, hideBelow: 'md' },
     { key: 'dev', header: 'Deviation', align: 'right', sort: (b) => b.deviation, cell: (b) => <Badge tone={b.deviation >= 5 ? 'critical' : 'serious'}>{b.direction === 'warm' ? '+' : '−'}{dec(b.deviation)}°C {b.direction === 'warm' ? 'warm' : 'cold'}</Badge> },
-    { key: 'q', header: 'Quarantined', align: 'right', sort: (b) => b.quarantines.length, cell: (b) => (b.quarantines.length ? <span className="font-medium">{b.quarantines.length} batch{b.quarantines.length > 1 ? 'es' : ''}</span> : <span className="text-xs text-muted">none on shelf</span>) },
-    { key: 'status', header: 'Resolution', cell: (b) => (b.quarantines.length ? <div className="flex flex-wrap gap-1">{b.quarantines.map((q) => <StatusBadge key={q.quarantine_id} value={q.status} meta={QUARANTINE_STATUS} />)}</div> : '—') },
+    { key: 'q', header: 'Quarantined', align: 'right', sort: (b) => b.quarantines.length, cell: (b) => (b.quarantines.length ? <span className="comp-bold">{b.quarantines.length} batch{b.quarantines.length > 1 ? 'es' : ''}</span> : <span className="comp-none-small">none on shelf</span>) },
+    { key: 'status', header: 'Resolution', cell: (b) => (b.quarantines.length ? <div className="comp-tags">{b.quarantines.map((q) => <StatusBadge key={q.quarantine_id} value={q.status} meta={QUARANTINE_STATUS} />)}</div> : '—') },
   ]
 
   const viewCols: Column<ColdChainViolationRow>[] = [
-    { key: 'd', header: 'Date', sort: (r) => r.violation_date, cell: (r) => <span className="tabular">{date(r.violation_date)}</span> },
+    { key: 'd', header: 'Date', sort: (r) => r.violation_date, cell: (r) => <span>{date(r.violation_date)}</span> },
     { key: 'a', header: 'Event', cell: (r) => humanize(r.action_type) },
-    { key: 'r', header: 'Resulting action', cell: (r) => (r.resulting_action ? humanize(r.resulting_action) : <span className="text-muted">—</span>) },
+    { key: 'r', header: 'Resulting action', cell: (r) => (r.resulting_action ? humanize(r.resulting_action) : <span className="comp-muted">—</span>) },
     { key: 'n', header: 'Incidents', align: 'right', sort: (r) => r.incident_count, cell: (r) => num(r.incident_count) },
   ]
 
@@ -80,24 +80,24 @@ export function ColdChainViolations() {
         <Stat label="Stock at risk" value={num(m.atRisk.reduce((s, x) => s + x.qty, 0))} sub={`${m.atRisk.length} active quarantines`} icon={ShieldAlert} tone="warn" />
       </StatGrid>
 
-      <Card className="mt-5">
+      <Card className="comp-gap-top">
         <CardHeader title="Temperature breaches" subtitle="Readings outside the location's target band, and the quarantines the database raised in response" icon={Snowflake} />
         <DataTable bare rows={m.breaches} columns={cols} rowKey={(b) => b.s.log_id} loading={t.isLoading} initialSort={{ key: 'when', dir: 'desc' }} emptyTitle="No breaches recorded" exportName="lethe-cold-chain-breaches" exportRow={(b) => ({ recorded_at: b.s.recorded_at, location: L.locLabel(b.loc.location_id), reading_c: b.s.temperature_celsius, target: `${b.loc.target_min_temp}-${b.loc.target_max_temp}`, deviation_c: b.deviation.toFixed(1), quarantined_batches: b.quarantines.length })} />
       </Card>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-2">
+      <div className="comp-gap-top-2 grid gap-5 xl:grid-cols-2">
         <Card>
           <CardHeader title="Breaches by facility" />
           <CardBody>{m.warehouseRows.length ? <BarList data={m.warehouseRows} y="name" value="count" label="Breaches" color={SERIES[7]} /> : <EmptyState title="No breaches" />}</CardBody>
         </Card>
         <Card>
           <CardHeader title="Products held in quarantine" subtitle="Active quarantine rows with the stock still on that shelf" />
-          <CardBody className="space-y-2">
-            {m.atRisk.length === 0 && <p className="text-[13px] text-ink-2">No active quarantines.</p>}
+          <CardBody>
+            {m.atRisk.length === 0 && <p className="comp-none-text">No active quarantines.</p>}
             {m.atRisk.map(({ q, qty }) => (
-              <div key={q.quarantine_id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line px-3 py-2.5">
-                <span className="text-[13px]">
-                  <Code>{L.batchNo(q.batch_id)}</Code> <span className="text-ink-2">{L.medName(q.batch_id)} · {L.locLabel(q.location_id)}</span>
+              <div key={q.quarantine_id} className="comp-quar-item">
+                <span className="comp-cell-small">
+                  <Code>{L.batchNo(q.batch_id)}</Code> <span className="comp-grey-text">{L.medName(q.batch_id)} · {L.locLabel(q.location_id)}</span>
                 </span>
                 <Badge tone="critical">{num(qty)} units held</Badge>
               </div>
@@ -106,7 +106,7 @@ export function ColdChainViolations() {
         </Card>
       </div>
 
-      <Card className="mt-5">
+      <Card className="comp-gap-top">
         <CardHeader title="Cold-chain violation ledger view" subtitle="financial_analytics.vw_cold_chain_violations (destruction and breach events per day)" />
         <DataTable bare rows={t.data.vwColdChain} columns={viewCols} rowKey={(r) => `${r.violation_date}-${r.action_type}-${r.resulting_action}`} loading={t.isLoading} emptyTitle="No violations in the view" />
       </Card>

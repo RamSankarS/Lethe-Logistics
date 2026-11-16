@@ -68,7 +68,7 @@ function Onboard({ open, onClose }: { open: boolean; onClose: () => void }) {
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="admin-modal-form">
         <Field label="Organisation name" required>
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Narmada Health Pharmacy" />
         </Field>
@@ -118,12 +118,12 @@ export function Organisations() {
 
   const rows = type === 'all' ? t.data.organisations : t.data.organisations.filter((o) => o.org_type === type)
   const cols: Column<Organisation>[] = [
-    { key: 'name', header: 'Organisation', sort: (o) => o.org_name, cell: (o) => <div><p className="font-medium text-ink">{o.org_name}</p><p className="text-xs text-ink-2">{o.contact_email}</p></div> },
+    { key: 'name', header: 'Organisation', sort: (o) => o.org_name, cell: (o) => <div><p className="admin-cell-main">{o.org_name}</p><p className="admin-cell-sub">{o.contact_email}</p></div> },
     { key: 'type', header: 'Type', sort: (o) => o.org_type, cell: (o) => <Badge tone={o.org_type === 'Regulatory_Body' ? 'warn' : o.org_type === 'Manufacturer' ? 'accent' : o.org_type === 'Distributor' ? 'info' : o.org_type === 'Retailer' ? 'good' : 'neutral'}>{ORG_TYPE_LABEL[o.org_type]}</Badge> },
     { key: 'reg', header: 'Registration', sort: (o) => o.reg_no, cell: (o) => <Code>{o.reg_no}</Code>, hideBelow: 'md' },
-    { key: 'portal', header: 'Portal', cell: (o) => { const p = resolvePortal(null, o.org_type); return p ? <span className="text-[13px] text-ink-2">{PORTALS[p].short}</span> : <span className="text-xs text-muted">None</span> }, hideBelow: 'lg' },
+    { key: 'portal', header: 'Portal', cell: (o) => { const p = resolvePortal(null, o.org_type); return p ? <span className="admin-cell-text">{PORTALS[p].short}</span> : <span className="admin-cell-none">None</span> }, hideBelow: 'lg' },
     { key: 'users', header: 'Active users', align: 'right', sort: (o) => users.get(o.org_id) ?? 0, cell: (o) => num(users.get(o.org_id) ?? 0) },
-    { key: 'since', header: 'Joined', sort: (o) => o.created_at_utc, cell: (o) => <span className="text-[13px] text-ink-2 tabular">{date(o.created_at_utc)}</span>, hideBelow: 'xl' },
+    { key: 'since', header: 'Joined', sort: (o) => o.created_at_utc, cell: (o) => <span className="admin-cell-text">{date(o.created_at_utc)}</span>, hideBelow: 'xl' },
     {
       key: 'active',
       header: 'Active',
@@ -149,11 +149,11 @@ export function Organisations() {
         <Stat label="Distributors & transporters" value={num(count('Distributor') + count('Transporter'))} icon={Building2} tone="info" />
         <Stat label="Retailers & regulators" value={num(count('Retailer') + count('Regulatory_Body'))} icon={Building2} tone="good" />
       </StatGrid>
-      <div className="mt-5 mb-3">
+      <div className="admin-filter-row">
         <Segmented value={type} onChange={setType} options={[{ value: 'all', label: 'All', count: count('all') }, ...ORG_TYPES.map((o) => ({ value: o, label: ORG_TYPE_LABEL[o], count: count(o) }))]} />
       </div>
       <DataTable rows={rows} columns={cols} rowKey={(o) => o.org_id} loading={t.isLoading} searchText={(o) => `${o.org_name} ${o.reg_no} ${o.contact_email}`} initialSort={{ key: 'name', dir: 'asc' }} pageSize={12} exportName="lethe-organisations" exportRow={(o) => ({ name: o.org_name, type: o.org_type, reg_no: o.reg_no, email: o.contact_email, active: o.is_active, users: users.get(o.org_id) ?? 0 })} />
-      <Callout tone="neutral" className="mt-5">
+      <Callout tone="neutral" className="admin-note-box">
         Suspending an organisation blocks its users at sign-in (the SysAdmin's own organisation cannot be suspended). Every change is written to the audit ledger.
       </Callout>
       <Onboard open={open} onClose={() => setOpen(false)} />

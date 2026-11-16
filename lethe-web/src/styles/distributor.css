@@ -1,0 +1,741 @@
+/* =========================================================
+   distributor portal styles
+   (warehouse boxes, location boxes, zone cards, pick list,
+   drivers...). the column grids are still tailwind classes
+   in the .tsx files, everything else is in here
+   ========================================================= */
+
+/* ---------- small text helpers (mostly for the tables) ---------- */
+
+.dist-cell-text {
+  font-size: 13px;
+}
+
+.dist-cell-grey {
+  font-size: 13px;
+  color: #555555;
+}
+
+.dist-grey {
+  color: #666666;
+}
+
+.dist-tiny-grey {
+  font-size: 12px;
+  color: #666666;
+}
+
+.dist-muted-small {
+  font-size: 12px;
+  color: #999999;
+  font-style: italic;
+}
+
+.dist-bold {
+  font-weight: bold;
+}
+
+.dist-red-text {
+  color: #DC3545;
+  font-weight: bold;
+}
+
+/* medicine name under the batch number */
+.dist-med-name {
+  font-size: 12px;
+  color: #666666;
+  margin: 2px 0 0 0;
+}
+
+/* inactive warehouses / locations */
+.dist-faded {
+  opacity: 0.6;
+}
+
+/* buttons next to each other in a table row */
+.dist-action-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.dist-btns-right {
+  justify-content: flex-end;
+}
+
+/* red "Remove" / "Destroyed" buttons, the normal plain button is blue */
+.dist-red-link {
+  color: #DC3545 !important;
+}
+
+.dist-red-link:hover {
+  background-color: #F8D7DA !important;
+}
+
+/* snowflake = cold room, sun = normal room */
+.dist-zone-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.dist-icon-cold {
+  color: #17A2B8;
+}
+
+.dist-icon-warm {
+  color: #E0A800;
+}
+
+.dist-card-gap {
+  margin-top: 20px;
+}
+
+/* this one looked too close to the box above it */
+.dist-card-gap-2 {
+  margin-top: 24px;
+}
+
+.dist-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.dist-filter-bar {
+  margin: 20px 0 11px 0;
+}
+
+/* stack of fields in the popups */
+.dist-modal-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ---------- overview: warehouse boxes ---------- */
+
+.dist-wh-grid {
+  margin-top: 18px;
+  gap: 15px;
+}
+
+.dist-wh-box {
+  padding: 13px 15px 14px 14px;
+}
+
+.dist-wh-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.dist-wh-info {
+  min-width: 0;
+}
+
+.dist-wh-name {
+  font-size: 15px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dist-wh-city {
+  font-size: 13px;
+  color: #666666;
+  margin: 2px 0 0 0;
+}
+
+.dist-capacity {
+  margin-top: 14px;
+}
+
+.dist-capacity-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.dist-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 11px;
+}
+
+/* ---------- overview: chart + alerts ---------- */
+
+.dist-chart-row {
+  margin-top: 23px;
+}
+
+/* took the side padding off so the list goes edge to edge */
+.dist-alerts-body {
+  padding: 0 0 6px 0 !important;
+}
+
+.dist-alert-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dist-alert-list li {
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.dist-alert-list li:last-child {
+  border-bottom: none;
+}
+
+.dist-alert-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 15px 9px 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #222222;
+  cursor: pointer;
+}
+
+.dist-alert-btn:hover {
+  background-color: #FFFFCC;
+}
+
+.dist-alert-tag {
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+/* needed this or the long text pushed the tag out of the box */
+.dist-alert-text {
+  min-width: 0;
+}
+
+.dist-alert-title {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dist-alert-detail {
+  display: block;
+  font-size: 12px;
+  color: #666666;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- inventory: location boxes ---------- */
+
+.dist-loc-grid {
+  gap: 11px;
+  margin-bottom: 21px;
+}
+
+/* these are buttons (click one to filter the table) */
+.dist-loc-box {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #222222;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 5px;
+  padding: 11px 12px 12px 13px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.dist-loc-box:hover {
+  background-color: #FFFFCC;
+  border-color: #999999;
+}
+
+/* hover was beating the selected colour so had to use !important */
+.dist-loc-selected {
+  border: 2px solid #0066CC !important;
+  background-color: #E8F1FB !important;
+  padding: 10px 11px 11px 12px; /* 1px less, the thick border made it jump */
+}
+
+.dist-loc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.dist-loc-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+}
+
+.dist-loc-target {
+  font-size: 12px;
+  color: #666666;
+  margin: 4px 0 0 0;
+  line-height: normal;
+}
+
+.dist-loc-count {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #555555;
+  margin: 10px 0 4px 0;
+}
+
+.dist-table-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+/* ---------- cold chain: zone cards ---------- */
+
+.dist-zone-box {
+  padding: 14px 15px 12px 14px;
+  cursor: pointer;
+}
+
+.dist-zone-box:hover {
+  background-color: #FFFFCC;
+  border-color: #999999;
+}
+
+.dist-zone-selected {
+  border: 2px solid #0066CC !important;
+  background-color: #E8F1FB !important;
+  padding: 13px 14px 11px 13px;
+}
+
+.dist-zone-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.dist-zone-info {
+  min-width: 0;
+}
+
+.dist-zone-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+}
+
+.dist-zone-sub {
+  font-size: 12px;
+  color: #666666;
+  margin: 2px 0 0 0;
+}
+
+.dist-zone-mid {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* the big temperature number */
+.dist-big-temp {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 28px;
+  font-weight: bold;
+  color: #222222;
+  margin: 0;
+  line-height: 36px;
+}
+
+.dist-temp-red {
+  color: #DC3545;
+}
+
+.dist-zone-hum {
+  font-size: 12px;
+  color: #666666;
+  margin: 0;
+}
+
+.dist-zone-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 11px;
+  padding-top: 7px;
+  border-top: 1px solid #DDDDDD;
+}
+
+/* the alert box css makes every <b> a block, this one has to stay in the sentence */
+.dist-breach-count {
+  display: inline !important;
+}
+
+/* colour comes from the red alert box */
+.dist-locked-note {
+  margin: 8px 0 0 0;
+  font-weight: bold;
+}
+
+/* ---------- fulfilment: pick list in the dispatch popup ---------- */
+
+.dist-pick-title {
+  margin: 0 0 7px 0;
+}
+
+.dist-pick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.dist-pick-item {
+  background-color: #F9F9F9;
+  border: 1px solid #CCCCCC;
+  border-radius: 3px;
+  padding: 8px 10px 9px 11px;
+}
+
+.dist-pick-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.dist-pick-qty {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.dist-pick-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+/* Cold / Stock OK / Overdue tags in the orders table */
+.dist-check-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.dist-status-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+/* ---------- fulfilment: order side panel ---------- */
+
+.dist-drawer-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.dist-stepper-body {
+  padding-top: 18px;
+}
+
+.dist-cancel-note {
+  margin-top: 14px;
+}
+
+.dist-order-lines {
+  border-top: 1px solid #DDDDDD;
+}
+
+.dist-line-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 10px 15px 10px 14px;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.dist-line-row:last-child {
+  border-bottom: none;
+}
+
+.dist-cold-tag {
+  margin-left: 6px;
+}
+
+.dist-no-lines {
+  padding: 13px 15px;
+  margin: 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+.dist-ship-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  font-size: 13px;
+}
+
+.dist-ship-label {
+  font-weight: bold;
+  color: #555555;
+  margin: 0;
+}
+
+.dist-ship-value {
+  color: #222222;
+  margin: 0;
+}
+
+.dist-pod-body {
+  font-size: 13px;
+}
+
+.dist-pod-body p {
+  margin: 0 0 4px 0;
+}
+
+.dist-signature {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  color: #888888;
+  word-break: break-all;
+}
+
+/* ---------- fleet ---------- */
+
+/* number plates look better in courier */
+.dist-reg-input {
+  font-family: "Courier New", Courier, monospace;
+  text-transform: uppercase;
+}
+
+.dist-driver-grid {
+  gap: 8px;
+  padding: 0 15px 16px 14px;
+}
+
+.dist-driver-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  padding: 8px 10px 8px 11px;
+}
+
+.dist-driver-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+}
+
+/* ---------- inbound returns ---------- */
+
+.dist-reason-cell {
+  max-width: 260px;
+}
+
+.dist-reason-text {
+  font-size: 13px;
+  color: #555555;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dist-bottom-note {
+  margin-top: 22px;
+}
+
+/* ---------- facilities ---------- */
+
+.dist-lock-note {
+  margin-bottom: 18px;
+}
+
+.dist-fac-box {
+  padding: 12px 16px 15px 15px;
+}
+
+.dist-fac-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.dist-fac-name {
+  font-size: 15px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+}
+
+.dist-loc-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.dist-use-cell {
+  width: 140px;
+}
+
+.dist-use-nums {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666666;
+  margin-bottom: 3px;
+}
+
+/* =========================================================
+   night mode for the distributor pages
+   (the red alert boxes stay light in night mode so the
+   text inside them is left alone)
+   ========================================================= */
+
+[data-theme="dark"] .dist-cell-grey,
+[data-theme="dark"] .dist-grey,
+[data-theme="dark"] .dist-tiny-grey,
+[data-theme="dark"] .dist-med-name,
+[data-theme="dark"] .dist-wh-city,
+[data-theme="dark"] .dist-alert-detail,
+[data-theme="dark"] .dist-loc-target,
+[data-theme="dark"] .dist-loc-count,
+[data-theme="dark"] .dist-zone-sub,
+[data-theme="dark"] .dist-zone-hum,
+[data-theme="dark"] .dist-no-lines,
+[data-theme="dark"] .dist-ship-label,
+[data-theme="dark"] .dist-reason-text,
+[data-theme="dark"] .dist-use-nums {
+  color: #B5B5B5;
+}
+
+[data-theme="dark"] .dist-muted-small,
+[data-theme="dark"] .dist-signature {
+  color: #AAAAAA;
+}
+
+[data-theme="dark"] .dist-wh-name,
+[data-theme="dark"] .dist-loc-name,
+[data-theme="dark"] .dist-zone-name,
+[data-theme="dark"] .dist-fac-name,
+[data-theme="dark"] .dist-driver-name,
+[data-theme="dark"] .dist-big-temp,
+[data-theme="dark"] .dist-ship-value,
+[data-theme="dark"] .dist-alert-btn {
+  color: #E6E6E6;
+}
+
+/* has to stay below .dist-big-temp */
+[data-theme="dark"] .dist-temp-red,
+[data-theme="dark"] .dist-red-text {
+  color: #FF6B6B;
+}
+
+[data-theme="dark"] .dist-red-link {
+  color: #FF8A8A !important;
+}
+
+[data-theme="dark"] .dist-red-link:hover {
+  background-color: #4D1C21 !important;
+}
+
+[data-theme="dark"] .dist-icon-cold {
+  color: #5BC0DE;
+}
+
+[data-theme="dark"] .dist-icon-warm {
+  color: #FFC107;
+}
+
+[data-theme="dark"] .dist-alert-list li,
+[data-theme="dark"] .dist-zone-foot,
+[data-theme="dark"] .dist-order-lines,
+[data-theme="dark"] .dist-line-row {
+  border-color: #555555;
+}
+
+[data-theme="dark"] .dist-alert-btn:hover {
+  background-color: #4A4A2A;
+}
+
+[data-theme="dark"] .dist-loc-box,
+[data-theme="dark"] .dist-pick-item {
+  background-color: #2B2B2B;
+  border-color: #555555;
+  color: #E6E6E6;
+}
+
+[data-theme="dark"] .dist-driver-box {
+  background-color: #333333;
+  border-color: #555555;
+}
+
+[data-theme="dark"] .dist-loc-box:hover {
+  background-color: #4A4A2A;
+  border-color: #777777;
+}
+
+/* the grey box css uses !important in night mode so this needs it too */
+[data-theme="dark"] .dist-zone-box:hover {
+  background-color: #4A4A2A !important;
+  border-color: #777777 !important;
+}
+
+/* selected box, keep this after the hover ones */
+[data-theme="dark"] .dist-loc-box.dist-loc-selected,
+[data-theme="dark"] .dist-zone-box.dist-zone-selected {
+  background-color: #1F3A57 !important;
+  border-color: #3399FF !important;
+}

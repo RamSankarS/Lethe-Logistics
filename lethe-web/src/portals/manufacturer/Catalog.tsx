@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { FlaskConical, Lock, PackageOpen, Pill, Plus, Snowflake, Thermometer } from 'lucide-react'
+import { FlaskConical, PackageOpen, Pill, Plus, Snowflake, Thermometer } from 'lucide-react'
 import { useProfile } from '@/auth/AuthProvider'
 import { logEvent, mustChange, useRunner } from '@/data/actions'
 import { useTables } from '@/data/hooks'
@@ -90,9 +90,9 @@ function AddMedicine({ open, onClose }: { open: boolean; onClose: () => void }) 
         </>
       }
     >
-      <div className="space-y-6">
+      <div className="mfr-med-form">
         <section>
-          <p className="mb-3 text-[12px] font-semibold tracking-wide text-muted uppercase">Master data</p>
+          <p className="mfr-section-label">Master data</p>
           <FormGrid className="sm:grid-cols-3">
             <Field label="Brand name" required error={dup ? 'Brand name already exists.' : undefined}>
               <Input value={f.brand} onChange={set('brand')} placeholder="Cardio-Safe 10" />
@@ -110,7 +110,7 @@ function AddMedicine({ open, onClose }: { open: boolean; onClose: () => void }) 
           </FormGrid>
         </section>
         <section>
-          <p className="mb-3 text-[12px] font-semibold tracking-wide text-muted uppercase">Chemical composition</p>
+          <p className="mfr-section-label">Chemical composition</p>
           <FormGrid className="sm:grid-cols-3">
             <Field label="Active ingredient" required>
               <Input value={f.ingredient} onChange={set('ingredient')} placeholder="Rosuvastatin Calcium" />
@@ -124,7 +124,7 @@ function AddMedicine({ open, onClose }: { open: boolean; onClose: () => void }) 
           </FormGrid>
         </section>
         <section>
-          <p className="mb-3 text-[12px] font-semibold tracking-wide text-muted uppercase">Storage standard</p>
+          <p className="mfr-section-label">Storage standard</p>
           <FormGrid className="sm:grid-cols-4">
             <Field label="Min °C" required>
               <Input type="number" step="0.5" value={f.minT} onChange={set('minT')} />
@@ -140,13 +140,13 @@ function AddMedicine({ open, onClose }: { open: boolean; onClose: () => void }) 
             </Field>
           </FormGrid>
           {Number(f.maxT) <= 8 && (
-            <Callout tone="info" icon={Snowflake} className="mt-3">
+            <Callout tone="info" icon={Snowflake} className="mfr-cold-note">
               Cold-chain product: it can only be stored in Cold Storage zones and should ship on Reefer vehicles.
             </Callout>
           )}
         </section>
         <section>
-          <p className="mb-3 text-[12px] font-semibold tracking-wide text-muted uppercase">Quality specification</p>
+          <p className="mfr-section-label">Quality specification</p>
           <FormGrid className="sm:grid-cols-4">
             <Field label="Purity threshold %" required>
               <Input type="number" step="0.01" min={0} max={100} value={f.purity} onChange={set('purity')} />
@@ -212,7 +212,7 @@ export function Catalog() {
           </Button>
         }
       />
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="mfr-filter-row">
         <Segmented
           value={cat}
           onChange={setCat}
@@ -223,8 +223,8 @@ export function Catalog() {
             { value: 'cold', label: 'Cold chain', count: cards.filter((c) => isColdChain(c.pkg)).length },
           ]}
         />
-        <p className="flex items-center gap-1.5 text-[12.5px] text-ink-2">
-          <Lock className="size-3.5" /> QC specifications are locked after registration. Changes would be flagged as spec tampering.
+        <p className="mfr-hint-text">
+          QC specifications are locked after registration. Changes would be flagged as spec tampering.
         </p>
       </div>
 
@@ -233,48 +233,48 @@ export function Catalog() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {shown.map(({ m, comp, pkg, spec, batchCount, units }) => (
-            <Card key={m.medicine_id} className={m.is_active ? '' : 'opacity-70'}>
-              <div className="flex items-start justify-between gap-3 px-5 pt-4">
+            <Card key={m.medicine_id} className={m.is_active ? 'mfr-med-card' : 'mfr-med-card mfr-med-off'}>
+              <div className="mfr-med-top">
                 <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="truncate text-[15px] font-semibold text-ink">{m.brand_name}</h3>
+                  <div className="mfr-med-title-line">
+                    <h3 className="mfr-med-name">{m.brand_name}</h3>
                     {isColdChain(pkg) && (
                       <Badge tone="info" icon={Snowflake}>
                         Cold chain
                       </Badge>
                     )}
                   </div>
-                  <p className="text-[13px] text-ink-2">
+                  <p className="mfr-med-generic">
                     {m.generic_name} · {m.category}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 pt-0.5">
-                  <span className="text-[11.5px] text-muted">{m.is_active ? 'Active' : 'Off'}</span>
+                <div className="mfr-switch-area">
+                  <span className="mfr-switch-label">{m.is_active ? 'Active' : 'Off'}</span>
                   <Switch checked={m.is_active} disabled={busy === `toggle-${m.medicine_id}`} onChange={(v) => void toggle(m.medicine_id, m.brand_name, v)} label={`Toggle ${m.brand_name}`} />
                 </div>
               </div>
-              <div className="mt-3 grid grid-cols-1 gap-2 px-5 pb-4 text-[12.5px]">
-                <div className="flex items-start gap-2 rounded-lg bg-surface-2 px-3 py-2">
-                  <Pill className="mt-0.5 size-3.5 shrink-0 text-accent-text" />
-                  <span className="text-ink-2">{comp ? `${comp.active_ingredient} · ${comp.strength} · ${comp.dosage_form}` : 'No composition on file'}</span>
+              <div className="mfr-med-info">
+                <div className="mfr-med-info-row">
+                  <Pill className="mfr-med-icon" />
+                  <span className="mfr-med-info-text">{comp ? `${comp.active_ingredient} · ${comp.strength} · ${comp.dosage_form}` : 'No composition on file'}</span>
                 </div>
-                <div className="flex items-start gap-2 rounded-lg bg-surface-2 px-3 py-2">
-                  <Thermometer className="mt-0.5 size-3.5 shrink-0 text-accent-text" />
-                  <span className="text-ink-2 tabular">
+                <div className="mfr-med-info-row">
+                  <Thermometer className="mfr-med-icon" />
+                  <span className="mfr-med-info-text">
                     {pkg ? `${pkg.min_temp_celsius}–${pkg.max_temp_celsius}°C · humidity ≤ ${pkg.humidity_limit}% · fragility ${pkg.fragility_index}/10` : 'No storage standard'}
                   </span>
                 </div>
-                <div className="flex items-start gap-2 rounded-lg bg-surface-2 px-3 py-2">
-                  <FlaskConical className="mt-0.5 size-3.5 shrink-0 text-accent-text" />
-                  <span className="text-ink-2">{spec ? `Purity ≥ ${spec.purity_threshold}% · ${spec.dissolution_rate} · pH ${spec.ph_balance_req} · ${spec.required_certs}` : 'No QC specification'}</span>
+                <div className="mfr-med-info-row">
+                  <FlaskConical className="mfr-med-icon" />
+                  <span className="mfr-med-info-text">{spec ? `Purity ≥ ${spec.purity_threshold}% · ${spec.dissolution_rate} · pH ${spec.ph_balance_req} · ${spec.required_certs}` : 'No QC specification'}</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between border-t border-line px-5 py-2.5 text-[12.5px] text-ink-2">
+              <div className="mfr-med-footer">
                 <span>
-                  <b className="font-semibold text-ink tabular">{num(batchCount)}</b> {batchCount === 1 ? 'batch' : 'batches'}
+                  <b className="mfr-med-count">{num(batchCount)}</b> {batchCount === 1 ? 'batch' : 'batches'}
                 </span>
                 <span>
-                  <b className="font-semibold text-ink tabular">{compact(units)}</b> units produced
+                  <b className="mfr-med-count">{compact(units)}</b> units produced
                 </span>
               </div>
             </Card>

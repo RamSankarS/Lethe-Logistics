@@ -1,12 +1,17 @@
 @import "tailwindcss";
+/* my own css (buttons, boxes, tables...). put in the components layer so the
+   tailwind classes in the portal pages can still override it */
+@import "./styles/main.css" layer(components);
+@import "./styles/manufacturer.css" layer(components);
+@import "./styles/distributor.css" layer(components);
+@import "./styles/retailer.css" layer(components);
+@import "./styles/compliance.css" layer(components);
+@import "./styles/admin.css" layer(components);
 
 /* Dark mode is driven by <html data-theme="dark">, toggled in the top bar. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/* ------------------------------------------------------------------------- */
-/* Design tokens. Every colour in the app is a token, so light/dark and the   */
-/* per-portal accent swap in one place.                                       */
-/* ------------------------------------------------------------------------- */
+/* colour names used by the tailwind classes in the portal pages */
 @theme inline {
   --color-page: var(--page);
   --color-surface: var(--surface);
@@ -41,140 +46,120 @@
   --color-info-soft: var(--info-soft);
   --color-info-text: var(--info-text);
 
-  --font-sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Code", Consolas, monospace;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "Courier New", Courier, monospace;
+}
+
+/* less round corners + normal shadows */
+@theme {
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 3px;
+  --radius-xl: 4px;
+  --radius-2xl: 5px;
+  --radius-3xl: 6px;
+
+  --shadow-xs: 1px 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-sm: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  --shadow-md: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 2px 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-xl: 2px 2px 10px rgba(0, 0, 0, 0.3);
+  --shadow-2xl: 2px 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 :root {
   color-scheme: light;
-  --page: #f3f5f8;
-  --surface: #ffffff;
-  --surface-2: #f8f9fb;
-  --surface-3: #eef1f5;
-  --line: #e3e7ed;
-  --line-strong: #cfd6e0;
-  --ink: #0e1726;
-  --ink-2: #475467;
-  --muted: #8590a2;
-  --sidebar: #0b1220;
-  --sidebar-2: #131c2e;
+  --page: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-2: #F4F4F4;
+  --surface-3: #EEEEEE;
+  --line: #CCCCCC;
+  --line-strong: #999999;
+  --ink: #222222;
+  --ink-2: #444444;
+  --muted: #777777;
+  --sidebar: #F4F4F4;
+  --sidebar-2: #E7E7E7;
 
-  /* Status palette (fixed, never themed) + readable text steps */
-  --good: #0ca30c;
-  --good-soft: #e7f6e9;
-  --good-text: #0b6b2a;
-  --warn: #fab219;
-  --warn-soft: #fff5dc;
-  --warn-text: #8a5300;
-  --serious: #ec835a;
-  --serious-soft: #fdeee7;
-  --serious-text: #a6441c;
-  --critical: #d03b3b;
-  --critical-soft: #fbe9e9;
-  --critical-text: #a32525;
-  --info: #2a78d6;
-  --info-soft: #e8f1fc;
-  --info-text: #1c5cab;
+  /* status colours (same as bootstrap) */
+  --good: #28A745;
+  --good-soft: #D4EDDA;
+  --good-text: #155724;
+  --warn: #FFC107;
+  --warn-soft: #FFF3CD;
+  --warn-text: #856404;
+  --serious: #FD7E14;
+  --serious-soft: #FFE5D0;
+  --serious-text: #8A4100;
+  --critical: #DC3545;
+  --critical-soft: #F8D7DA;
+  --critical-text: #721C24;
+  --info: #17A2B8;
+  --info-soft: #D1ECF1;
+  --info-text: #0C5460;
 
-  /* Chart tokens (validated categorical order, light steps) */
-  --series-1: #2a78d6;
-  --series-2: #eb6834;
-  --series-3: #1baf7a;
-  --series-4: #eda100;
-  --series-5: #e87ba4;
-  --series-6: #008300;
-  --series-7: #6250d6;
-  --series-8: #e34948;
-  --grid: #e9ecf1;
-  --axis: #c3c9d3;
+  /* chart colours (chart.js default ones) */
+  --series-1: #36A2EB;
+  --series-2: #FF6384;
+  --series-3: #4BC0C0;
+  --series-4: #FF9F40;
+  --series-5: #9966FF;
+  --series-6: #FFCD56;
+  --series-7: #8B4513;
+  --series-8: #DC3545; /* used for losses / breaches so keep it red */
+  --grid: #DDDDDD;
+  --axis: #999999;
 
-  /* Default accent (login screen) */
-  --accent: #0f766e;
-  --accent-ink: #ffffff;
-  --accent-soft: #e6f4f2;
-  --accent-text: #0f766e;
+  /* main colour */
+  --accent: #0066CC;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #DDEEFF;
+  --accent-text: #0066CC;
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --page: #0a0f18;
-  --surface: #111827;
-  --surface-2: #151d2d;
-  --surface-3: #1c2537;
-  --line: #243045;
-  --line-strong: #33405a;
-  --ink: #edf1f7;
-  --ink-2: #b3bccb;
-  --muted: #7b879b;
-  --sidebar: #060a12;
-  --sidebar-2: #0e1522;
+  --page: #1E1E1E;
+  --surface: #2B2B2B;
+  --surface-2: #333333;
+  --surface-3: #3D3D3D;
+  --line: #555555;
+  --line-strong: #777777;
+  --ink: #E6E6E6;
+  --ink-2: #CCCCCC;
+  --muted: #999999;
+  --sidebar: #2B2B2B;
+  --sidebar-2: #333333;
 
-  --good-soft: rgba(12, 163, 12, 0.16);
-  --good-text: #4ade80;
-  --warn-soft: rgba(250, 178, 25, 0.15);
-  --warn-text: #fcd34d;
-  --serious-soft: rgba(236, 131, 90, 0.16);
-  --serious-text: #f4a582;
-  --critical-soft: rgba(208, 59, 59, 0.2);
-  --critical-text: #f28b8b;
-  --info: #3987e5;
-  --info-soft: rgba(57, 135, 229, 0.16);
-  --info-text: #86b6ef;
+  --good-soft: #1E4D2B;
+  --good-text: #8FE3A3;
+  --warn-soft: #4D3E0F;
+  --warn-text: #FFE08A;
+  --serious-soft: #4D2E14;
+  --serious-text: #FFB27A;
+  --critical-soft: #4D1C21;
+  --critical-text: #F5A3AB;
+  --info-soft: #11414A;
+  --info-text: #8FDCE8;
 
-  --series-1: #3987e5;
-  --series-2: #d95926;
-  --series-3: #199e70;
-  --series-4: #c98500;
-  --series-5: #d55181;
-  --series-6: #0ca30c;
-  --series-7: #9085e9;
-  --series-8: #e66767;
-  --grid: #1f2a3c;
-  --axis: #3a4660;
+  --grid: #444444;
+  --axis: #777777;
 
-  --accent: #2dd4bf;
-  --accent-ink: #04201c;
-  --accent-soft: rgba(45, 212, 191, 0.14);
-  --accent-text: #5eead4;
+  --accent: #3399FF;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #1F3A57;
+  --accent-text: #66B2FF;
 }
 
-/* ------------------------------------------------------------------------- */
-/* Per-portal accents: each login gets its own identity colour.               */
-/* ------------------------------------------------------------------------- */
-[data-portal="manufacturer"] { --accent: #5b45d6; --accent-ink: #ffffff; --accent-soft: #efecfd; --accent-text: #4c37c4; }
-[data-portal="distributor"]  { --accent: #0369a1; --accent-ink: #ffffff; --accent-soft: #e5f3fb; --accent-text: #0369a1; }
-[data-portal="retailer"]     { --accent: #047857; --accent-ink: #ffffff; --accent-soft: #e3f5ee; --accent-text: #047857; }
-[data-portal="compliance"]   { --accent: #b45309; --accent-ink: #ffffff; --accent-soft: #fdf1e4; --accent-text: #9a4708; }
-[data-portal="admin"]        { --accent: #1d4ed8; --accent-ink: #ffffff; --accent-soft: #e8eefd; --accent-text: #1d4ed8; }
-
-[data-theme="dark"] [data-portal="manufacturer"], [data-theme="dark"][data-portal="manufacturer"] { --accent: #9d8cf8; --accent-ink: #160f3a; --accent-soft: rgba(157, 140, 248, 0.15); --accent-text: #b8acfb; }
-[data-theme="dark"] [data-portal="distributor"],  [data-theme="dark"][data-portal="distributor"]  { --accent: #38bdf8; --accent-ink: #062033; --accent-soft: rgba(56, 189, 248, 0.14); --accent-text: #7dd3fc; }
-[data-theme="dark"] [data-portal="retailer"],     [data-theme="dark"][data-portal="retailer"]     { --accent: #34d399; --accent-ink: #042a1d; --accent-soft: rgba(52, 211, 153, 0.14); --accent-text: #6ee7b7; }
-[data-theme="dark"] [data-portal="compliance"],   [data-theme="dark"][data-portal="compliance"]   { --accent: #f59e0b; --accent-ink: #2a1702; --accent-soft: rgba(245, 158, 11, 0.15); --accent-text: #fbbf24; }
-[data-theme="dark"] [data-portal="admin"],        [data-theme="dark"][data-portal="admin"]        { --accent: #60a5fa; --accent-ink: #071a36; --accent-soft: rgba(96, 165, 250, 0.15); --accent-text: #93c5fd; }
-
-/* ------------------------------------------------------------------------- */
-/* Base                                                                       */
-/* ------------------------------------------------------------------------- */
 @layer base {
   html, body, #root { height: 100%; }
   body {
     background: var(--page);
     color: var(--ink);
     font-family: var(--font-sans);
-    font-feature-settings: "cv11", "ss01";
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
-  :focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-    border-radius: 6px;
-  }
-  ::selection { background: var(--accent-soft); color: var(--ink); }
-  * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
   input, select, textarea, button { font: inherit; }
-  input[type="number"]::-webkit-inner-spin-button { opacity: 0.6; }
 }
 
 @layer utilities {
@@ -184,19 +169,5 @@
   .scrollbar-none::-webkit-scrollbar { display: none; }
 }
 
-/* Subtle entrance for drawers / modals / pages */
-@keyframes lethe-fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-@keyframes lethe-slide-in { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes lethe-pop { from { opacity: 0; transform: scale(0.98) translateY(6px); } to { opacity: 1; transform: none; } }
-@keyframes lethe-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-.animate-fade-in { animation: lethe-fade-in 220ms ease-out both; }
-.animate-slide-in { animation: lethe-slide-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-.animate-pop { animation: lethe-pop 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-.animate-live { animation: lethe-pulse 1.6s ease-in-out infinite; }
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-fade-in, .animate-slide-in, .animate-pop, .animate-live { animation: none; }
-}
-
-/* Recharts: keep focus outlines off SVG wrappers (we style our own). */
-.recharts-wrapper:focus, .recharts-surface:focus { outline: none; }
+/* old animation classes, switched off */
+.animate-fade-in, .animate-slide-in, .animate-pop, .animate-live { animation: none; }

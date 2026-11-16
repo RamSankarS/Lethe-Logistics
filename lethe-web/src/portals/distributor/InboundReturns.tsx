@@ -39,12 +39,12 @@ export function InboundReturns() {
   const count = (f: Filter) => t.data.returns.filter((r) => match(r, f)).length
 
   const cols: Column<ReturnRequest>[] = [
-    { key: 'id', header: 'Return', sort: (r) => r.return_id, cell: (r) => <span className="font-semibold tabular">#{r.return_id}</span> },
-    { key: 'batch', header: 'Batch', sort: (r) => L.batchNo(r.batch_id), cell: (r) => <div><Code>{L.batchNo(r.batch_id)}</Code><p className="mt-0.5 text-xs text-ink-2">{L.medName(r.batch_id)}</p></div> },
-    { key: 'from', header: 'Collect from', sort: (r) => L.orgName(r.returner_org_id), cell: (r) => <span className="text-[13px]">{L.orgName(r.returner_org_id)}</span> },
+    { key: 'id', header: 'Return', sort: (r) => r.return_id, cell: (r) => <span className="dist-bold">#{r.return_id}</span> },
+    { key: 'batch', header: 'Batch', sort: (r) => L.batchNo(r.batch_id), cell: (r) => <div><Code>{L.batchNo(r.batch_id)}</Code><p className="dist-med-name">{L.medName(r.batch_id)}</p></div> },
+    { key: 'from', header: 'Collect from', sort: (r) => L.orgName(r.returner_org_id), cell: (r) => <span className="dist-cell-text">{L.orgName(r.returner_org_id)}</span> },
     { key: 'qty', header: 'Units', align: 'right', sort: (r) => r.quantity_returned, cell: (r) => num(r.quantity_returned) },
-    { key: 'reason', header: 'Reason', cell: (r) => <div className="max-w-[260px]"><p className="truncate text-[13px] text-ink-2" title={r.return_reason}>{r.return_reason}</p>{r.recall_id && <Badge tone="critical">Recall #{r.recall_id}</Badge>}</div>, hideBelow: 'lg' },
-    { key: 'filed', header: 'Filed', sort: (r) => r.created_at_utc, cell: (r) => <span className="text-[13px] text-ink-2" title={date(r.created_at_utc)}>{relative(r.created_at_utc)}</span>, hideBelow: 'md' },
+    { key: 'reason', header: 'Reason', cell: (r) => <div className="dist-reason-cell"><p className="dist-reason-text" title={r.return_reason}>{r.return_reason}</p>{r.recall_id && <Badge tone="critical">Recall #{r.recall_id}</Badge>}</div>, hideBelow: 'lg' },
+    { key: 'filed', header: 'Filed', sort: (r) => r.created_at_utc, cell: (r) => <span className="dist-cell-grey" title={date(r.created_at_utc)}>{relative(r.created_at_utc)}</span>, hideBelow: 'md' },
     { key: 'status', header: 'Stage', sort: (r) => RETURN_FLOW.indexOf(r.status), cell: (r) => <StatusBadge value={r.status} meta={RETURN_STATUS} /> },
     {
       key: 'act',
@@ -59,7 +59,7 @@ export function InboundReturns() {
             Receive
           </Button>
         ) : (
-          <span className="text-xs text-muted">{r.status === 'Received' ? 'With manufacturer' : '—'}</span>
+          <span className="dist-muted-small">{r.status === 'Received' ? 'With manufacturer' : '—'}</span>
         ),
     },
   ]
@@ -73,7 +73,7 @@ export function InboundReturns() {
         <Stat label="At depot" value={num(count('Received'))} sub="awaiting manufacturer inspection" icon={PackageCheck} tone="accent" onClick={() => setFilter('Received')} />
         <Stat label="Units inbound" value={num(t.data.returns.filter((r) => r.status === 'Initiated' || r.status === 'In_Transit').reduce((s, r) => s + r.quantity_returned, 0))} sub="still to reach the depot" icon={Undo2} />
       </StatGrid>
-      <div className="mt-5 mb-3">
+      <div className="dist-filter-bar">
         <Segmented<Filter>
           value={filter}
           onChange={setFilter}
@@ -81,7 +81,7 @@ export function InboundReturns() {
         />
       </div>
       <DataTable rows={rows} columns={cols} rowKey={(r) => r.return_id} loading={t.isLoading} searchText={(r) => `${r.return_id} ${L.batchNo(r.batch_id)} ${L.orgName(r.returner_org_id)}`} initialSort={{ key: 'id', dir: 'desc' }} emptyTitle="Queue is empty" />
-      <Callout tone="neutral" className="mt-5">
+      <Callout tone="neutral" className="dist-bottom-note">
         The distributor owns the physical leg of reverse logistics: collect from the returning organisation, then receive at the depot. Inspection, refunds and destruction happen in the Manufacturer portal.
       </Callout>
     </>

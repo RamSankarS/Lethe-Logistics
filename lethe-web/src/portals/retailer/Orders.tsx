@@ -126,8 +126,8 @@ function NewOrder({ open, onClose }: { open: boolean; onClose: () => void }) {
       description="Order by medicine. Lethe allocates the earliest-expiring released batches first (FEFO)."
       footer={
         <>
-          <span className="mr-auto text-[13px] text-ink-2">
-            Subtotal <b className="text-ink tabular">{money2(subtotal)}</b> · +5% GST on invoice
+          <span className="retailer-subtotal">
+            Subtotal <b>{money2(subtotal)}</b> · +5% GST on invoice
           </span>
           <Button variant="ghost" onClick={onClose}>
             Cancel
@@ -139,48 +139,48 @@ function NewOrder({ open, onClose }: { open: boolean; onClose: () => void }) {
       }
     >
       <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-2">
+        <div className="retailer-catalog-list">
           {catalog.length === 0 && <EmptyState title="No released stock available" />}
           {catalog.map((c) => {
             const q = cart[c.medicineId] ?? 0
             return (
-              <div key={c.medicineId} className={`grid grid-cols-1 items-center gap-3 rounded-xl border px-3.5 py-3 sm:grid-cols-[minmax(0,1fr)_auto] ${q ? 'border-accent bg-accent-soft' : 'border-line'}`}>
+              <div key={c.medicineId} className={`retailer-catalog-row grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto] ${q ? 'retailer-row-picked' : ''}`}>
                 <div className="min-w-0">
-                  <p className="flex items-center gap-2 text-[13.5px] font-semibold text-ink">
+                  <p className="retailer-med-name">
                     {c.brand}
                     {c.cold && <Badge tone="info" icon={Snowflake}>Cold</Badge>}
                   </p>
-                  <p className="text-xs text-ink-2">
+                  <p className="retailer-med-info">
                     {c.generic} · {c.category} · {money(c.price)}/unit · {num(c.available)} available
                   </p>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="retailer-qty-box">
                   <Button size="sm" variant="secondary" icon={Minus} aria-label="Less" onClick={() => set(c.medicineId, q - 50, c.available)} disabled={q <= 0} />
-                  <Input type="number" min={0} max={c.available} value={q || ''} placeholder="0" onChange={(e) => set(c.medicineId, Number(e.target.value), c.available)} className="h-8 w-24 text-center tabular" />
+                  <Input type="number" min={0} max={c.available} value={q || ''} placeholder="0" onChange={(e) => set(c.medicineId, Number(e.target.value), c.available)} className="retailer-qty-input" />
                   <Button size="sm" variant="secondary" icon={Plus} aria-label="More" onClick={() => set(c.medicineId, q + 50, c.available)} disabled={q >= c.available} />
                 </div>
               </div>
             )
           })}
         </div>
-        <div className="space-y-4">
+        <div className="retailer-order-side">
           <Field label="Expected delivery" required error={!dateOk ? 'Must be after today.' : undefined}>
             <Input type="date" min={todayISO(1)} value={expected} onChange={(e) => setExpected(e.target.value)} />
           </Field>
-          <Card className="shadow-none">
+          <Card className="retailer-alloc-box">
             <CardHeader
               title="Batch allocation"
               subtitle="FEFO: first expiry, first out"
               actions={allocation.length > 0 && <Button size="xs" variant="ghost" icon={Trash2} onClick={() => setCart({})}>Clear</Button>}
             />
-            <CardBody className="space-y-2">
-              {allocation.length === 0 && <p className="text-[13px] text-ink-2">Add quantities to see which batches will be shipped.</p>}
+            <CardBody className="retailer-alloc-list">
+              {allocation.length === 0 && <p className="retailer-none-text">Add quantities to see which batches will be shipped.</p>}
               {allocation.map((a) => (
-                <div key={a.batchId} className="flex items-center justify-between gap-2 text-[12.5px]">
+                <div key={a.batchId} className="retailer-alloc-line">
                   <span className="min-w-0">
-                    <Code>{num(a.qty)}</Code> <span className="text-ink-2">{a.brand}</span>
+                    <Code>{num(a.qty)}</Code> <span className="retailer-alloc-brand">{a.brand}</span>
                   </span>
-                  <span className="text-ink tabular">{money(a.qty * a.unit)}</span>
+                  <span className="retailer-alloc-money">{money(a.qty * a.unit)}</span>
                 </div>
               ))}
             </CardBody>
@@ -223,13 +223,13 @@ export function Orders() {
     )
 
   const cols: Column<Row>[] = [
-    { key: 'id', header: 'Order', sort: (x) => x.o.order_id, cell: (x) => <span className="font-semibold tabular">#{x.o.order_id}</span> },
-    { key: 'date', header: 'Placed', sort: (x) => x.o.order_date, cell: (x) => <span className="text-[13px] text-ink-2 tabular">{date(x.o.order_date)}</span> },
-    { key: 'lines', header: 'Items', cell: (x) => <span className="text-[13px] text-ink-2">{x.items.length ? [...new Set(x.items.map((i) => L.medName(i.batch_id)))].join(', ') : 'No lines'}</span>, hideBelow: 'lg' },
+    { key: 'id', header: 'Order', sort: (x) => x.o.order_id, cell: (x) => <span className="retailer-id-cell">#{x.o.order_id}</span> },
+    { key: 'date', header: 'Placed', sort: (x) => x.o.order_date, cell: (x) => <span className="retailer-cell-grey">{date(x.o.order_date)}</span> },
+    { key: 'lines', header: 'Items', cell: (x) => <span className="retailer-cell-grey">{x.items.length ? [...new Set(x.items.map((i) => L.medName(i.batch_id)))].join(', ') : 'No lines'}</span>, hideBelow: 'lg' },
     { key: 'value', header: 'Value', align: 'right', sort: (x) => x.value, cell: (x) => money(x.value) },
-    { key: 'expected', header: 'Expected', sort: (x) => x.o.expected_del_date ?? '', cell: (x) => <span className="text-[13px] text-ink-2 tabular">{date(x.o.expected_del_date)}</span>, hideBelow: 'md' },
+    { key: 'expected', header: 'Expected', sort: (x) => x.o.expected_del_date ?? '', cell: (x) => <span className="retailer-cell-grey">{date(x.o.expected_del_date)}</span>, hideBelow: 'md' },
     { key: 'status', header: 'Status', sort: (x) => ORDER_FLOW.indexOf(x.o.order_status), cell: (x) => <StatusBadge value={x.o.order_status} meta={ORDER_STATUS} /> },
-    { key: 'invoice', header: 'Invoice', cell: (x) => (x.invoice ? <StatusBadge value={x.invoice.payment_status} meta={PAYMENT_STATUS} /> : <span className="text-xs text-muted">—</span>), hideBelow: 'md' },
+    { key: 'invoice', header: 'Invoice', cell: (x) => (x.invoice ? <StatusBadge value={x.invoice.payment_status} meta={PAYMENT_STATUS} /> : <span className="retailer-cell-dash">—</span>), hideBelow: 'md' },
     {
       key: 'act',
       header: '',
@@ -249,7 +249,7 @@ export function Orders() {
   return (
     <>
       <PageHeader actions={<Button variant="primary" icon={ShoppingCart} onClick={() => setParams({ new: '1' })}>New purchase order</Button>} />
-      <div className="mb-4">
+      <div className="retailer-filter-row">
         <Segmented<Filter>
           value={filter}
           onChange={setFilter}
@@ -278,32 +278,32 @@ export function Orders() {
 
       <Drawer open={!!open} onClose={() => setOpenId(null)} title={open ? `Order #${open.o.order_id}` : ''} subtitle={open ? `Placed ${date(open.o.order_date)} · expected ${date(open.o.expected_del_date)}` : ''}>
         {open && (
-          <div className="space-y-4">
+          <div className="retailer-drawer-stack">
             <Card>
-              <CardBody className="pt-5">
+              <CardBody className="retailer-stepper-body">
                 <Stepper steps={ORDER_FLOW} current={open.o.order_status === 'Cancelled' ? 'Pending' : open.o.order_status} failed={open.o.order_status === 'Cancelled'} />
               </CardBody>
             </Card>
             <Card>
               <CardHeader title="Lines" subtitle={money(open.value)} />
-              <div className="divide-y divide-line border-t border-line">
+              <div className="retailer-lines-list">
                 {open.items.map((i) => (
-                  <div key={i.order_item_id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-[13px]">
+                  <div key={i.order_item_id} className="retailer-line-row">
                     <span>
-                      <b className="font-medium text-ink">{L.medName(i.batch_id)}</b> <Code>{L.batchNo(i.batch_id)}</Code>
+                      <b>{L.medName(i.batch_id)}</b> <Code>{L.batchNo(i.batch_id)}</Code>
                     </span>
-                    <span className="tabular">
+                    <span className="retailer-line-qty">
                       {num(i.quantity)} × {money(i.unit_price)}
                     </span>
                   </div>
                 ))}
-                {open.items.length === 0 && <p className="px-5 py-4 text-[13px] text-ink-2">No lines.</p>}
+                {open.items.length === 0 && <p className="retailer-lines-empty">No lines.</p>}
               </div>
             </Card>
             {open.manifest && (
               <Card>
                 <CardHeader title="Shipment" actions={<StatusBadge value={open.manifest.manifest_status} meta={MANIFEST_STATUS} />} />
-                <CardBody className="text-[13px] text-ink-2">
+                <CardBody className="retailer-ship-info">
                   {L.vehicle.get(open.manifest.vehicle_id)?.vehicle_no} ({L.vehicle.get(open.manifest.vehicle_id)?.vehicle_type}) · driver {L.userName(open.manifest.driver_user_id)}
                   <br />
                   Dispatched {dateTime(open.manifest.dispatch_time_utc)} · ETA {open.manifest.estimated_arrival_time ? relative(open.manifest.estimated_arrival_time) : 'n/a'}
@@ -313,10 +313,10 @@ export function Orders() {
             {open.invoice && (
               <Card>
                 <CardHeader title="Invoice" actions={<StatusBadge value={open.invoice.payment_status} meta={PAYMENT_STATUS} />} />
-                <CardBody className="grid grid-cols-3 gap-3 text-[13px]">
-                  <div><p className="text-muted">Base</p><p className="text-ink tabular">{money2(open.invoice.base_amount)}</p></div>
-                  <div><p className="text-muted">GST</p><p className="text-ink tabular">{num(open.invoice.tax_percentage)}%</p></div>
-                  <div><p className="text-muted">Total</p><p className="font-semibold text-ink tabular">{money2(open.invoice.total_transaction_amount)}</p></div>
+                <CardBody className="retailer-invoice-grid grid grid-cols-3 gap-3">
+                  <div><p className="retailer-small-label">Base</p><p className="retailer-small-value">{money2(open.invoice.base_amount)}</p></div>
+                  <div><p className="retailer-small-label">GST</p><p className="retailer-small-value">{num(open.invoice.tax_percentage)}%</p></div>
+                  <div><p className="retailer-small-label">Total</p><p className="retailer-small-value retailer-total">{money2(open.invoice.total_transaction_amount)}</p></div>
                 </CardBody>
               </Card>
             )}

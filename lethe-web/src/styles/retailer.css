@@ -1,0 +1,742 @@
+/* =========================================================
+   retailer portal styles
+   (the pharmacy pages: home, orders, receiving, returns,
+   recalls). the cards are still .box-1 from main.css, this
+   file is for the stuff i put inside them
+   ========================================================= */
+
+
+/* ---------- bits used on more than one page ---------- */
+
+/* "nothing here" type messages */
+.retailer-none-text {
+  margin: 0;
+  font-size: 13px;
+  color: #777777;
+  font-style: italic;
+}
+
+/* table cells */
+.retailer-id-cell {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.retailer-cell-grey {
+  font-size: 13px;
+  color: #555555;
+}
+
+.retailer-cell-text {
+  font-size: 13px;
+}
+
+.retailer-cell-sub {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #666666;
+}
+
+.retailer-cell-dash {
+  font-size: 12px;
+  color: #999999;
+}
+
+.retailer-cell-muted {
+  font-size: 12px;
+  color: #888888;
+  font-style: italic;
+}
+
+/* small grey label on top of a value (invoice, vehicle, driver...) */
+.retailer-small-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: bold;
+  color: #666666;
+}
+
+.retailer-small-value {
+  margin: 2px 0 0 0;
+  font-size: 15px;
+}
+
+.retailer-grey-line {
+  color: #555555;
+}
+
+/* boxes in the side panel (order details / return details) */
+.retailer-drawer-stack > div {
+  margin-bottom: 15px;
+}
+
+/* last box doesnt need the gap */
+.retailer-drawer-stack > div:last-child {
+  margin-bottom: 0;
+}
+
+/* first box in the side panel has no header, the steps were stuck to the top */
+.retailer-stepper-body {
+  padding-top: 18px;
+}
+
+/* "file a return" popup (shared.tsx) */
+.retailer-return-form > div {
+  margin-bottom: 14px;
+}
+
+.retailer-return-form > div:last-child {
+  margin-bottom: 0;
+}
+
+
+/* ---------- home page (Overview.tsx) ---------- */
+
+/* red recall messages at the top */
+.retailer-alert-list {
+  margin-bottom: 22px;
+}
+
+.retailer-alert-list > div {
+  margin-bottom: 10px;
+}
+
+.retailer-alert-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.retailer-alert-held {
+  display: block;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.retailer-alert-acked {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* recent orders + the boxes on the right */
+.retailer-main-row {
+  margin-top: 18px;
+}
+
+.retailer-side-col > div {
+  margin-bottom: 17px;
+}
+
+.retailer-side-col > div:last-child {
+  margin-bottom: 0;
+}
+
+/* one box for each recent order */
+.retailer-order-box {
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  padding: 11px 14px 13px 13px;
+  margin-bottom: 12px;
+}
+
+.retailer-order-box:last-child {
+  margin-bottom: 0;
+}
+
+/* dotted line looks better than a full one here */
+.retailer-order-box-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 7px;
+  border-bottom: 1px dotted #BBBBBB;
+}
+
+.retailer-order-no {
+  font-size: 15px;
+  font-weight: bold;
+  color: #000000;
+}
+
+.retailer-order-meta {
+  font-size: 13px;
+  color: #555555;
+}
+
+/* "on the road" list, each row is a button that opens the receiving page */
+.retailer-road-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  padding: 8px 11px 8px 10px;
+  text-align: left;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* yellow on hover, same as the table rows */
+.retailer-road-item:hover {
+  background-color: #FFFFCC;
+}
+
+.retailer-road-title {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #0066CC;
+  line-height: normal;
+}
+
+.retailer-road-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: #666666;
+}
+
+/* latest return box */
+.retailer-latest-return {
+  font-size: 13px;
+}
+
+.retailer-latest-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.retailer-latest-sub {
+  margin: 4px 0 0 0;
+  color: #555555;
+}
+
+
+/* ---------- orders page (Orders.tsx) ---------- */
+
+.retailer-filter-row {
+  margin-bottom: 14px;
+}
+
+/* new purchase order popup: the medicines on the left */
+.retailer-catalog-list {
+  min-width: 0;
+}
+
+.retailer-catalog-row {
+  margin-bottom: 7px;
+  padding: 9px 12px 9px 11px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+}
+
+/* goes light blue once you type a quantity */
+.retailer-row-picked {
+  background-color: #DDEEFF;
+  border-color: #0066CC;
+}
+
+.retailer-med-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.retailer-med-info {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #666666;
+}
+
+.retailer-qty-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* .text-input is 100% wide so i had to force this one */
+.retailer-qty-input {
+  width: 82px !important;
+  height: 30px;
+  text-align: center;
+}
+
+/* right side of the popup */
+.retailer-order-side > div {
+  margin-bottom: 15px;
+}
+
+.retailer-order-side > div:last-child {
+  margin-bottom: 0;
+}
+
+/* no shadow inside the popup, it looked weird */
+.retailer-alloc-box {
+  box-shadow: none;
+}
+
+.retailer-alloc-list {
+  padding-bottom: 12px;
+}
+
+.retailer-alloc-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0 5px 0;
+  font-size: 13px;
+  border-bottom: 1px dotted #BBBBBB;
+}
+
+.retailer-alloc-line:last-child {
+  border-bottom: none;
+}
+
+.retailer-alloc-brand {
+  color: #555555;
+}
+
+.retailer-alloc-money {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* subtotal at the bottom of the popup */
+.retailer-subtotal {
+  margin-right: auto;
+  padding-top: 5px; /* pushed it down so its level with the buttons (more or less) */
+  font-size: 14px;
+  color: #444444;
+}
+
+.retailer-subtotal b {
+  font-size: 15px;
+  color: #000000;
+}
+
+/* order side panel */
+.retailer-lines-list {
+  margin: 0 15px 15px 15px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+}
+
+.retailer-line-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.retailer-line-row:last-child {
+  border-bottom: none;
+}
+
+.retailer-line-qty {
+  white-space: nowrap;
+}
+
+.retailer-lines-empty {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #777777;
+}
+
+.retailer-ship-info {
+  font-size: 13px;
+  color: #444444;
+  line-height: 21px;
+}
+
+.retailer-invoice-grid {
+  font-size: 14px;
+}
+
+.retailer-total {
+  font-weight: bold;
+}
+
+
+/* ---------- receiving page (Receiving.tsx) ---------- */
+
+/* one box for each shipment on the way */
+.retailer-ship-box {
+  padding: 13px 15px 12px 15px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 6px;
+}
+
+.retailer-ship-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.retailer-ship-sub {
+  margin: 1px 0 0 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+/* grey box with vehicle / driver / eta */
+.retailer-ship-details {
+  margin-top: 10px;
+  padding: 8px 10px 9px 10px;
+  font-size: 13px;
+  background-color: #F4F4F4;
+  border: 1px solid #DDDDDD;
+}
+
+.retailer-detail-value {
+  margin: 1px 0 0 0;
+}
+
+.retailer-ship-nomanifest {
+  margin: 10px 0 0 0;
+  font-size: 13px;
+  color: #777777;
+  font-style: italic;
+}
+
+.retailer-ship-btn-row {
+  margin-top: 12px;
+  text-align: right;
+}
+
+.retailer-history-box {
+  margin-top: 23px;
+}
+
+/* cuts long remarks off with ... */
+.retailer-remarks-cell {
+  display: block;
+  max-width: 280px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  color: #555555;
+}
+
+.retailer-sig-code {
+  font-size: 12px;
+}
+
+/* sign for delivery popup */
+.retailer-sign-form > div {
+  margin-bottom: 16px;
+}
+
+.retailer-sign-form > div:last-child {
+  margin-bottom: 0;
+}
+
+.retailer-sign-lines {
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+}
+
+.retailer-sign-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 11px;
+  font-size: 13px;
+}
+
+.retailer-sign-line-border {
+  border-bottom: 1px solid #DDDDDD;
+}
+
+/* Good / Partial / Damaged buttons */
+.retailer-cond-btn {
+  padding: 9px 10px;
+  text-align: left;
+  background-color: #FFFFFF;
+  border: 1px solid #AAAAAA;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.retailer-cond-off:hover {
+  background-color: #EEEEEE;
+}
+
+/* the picked one gets a thicker border,
+   took 1px off the padding so the text doesnt jump */
+.retailer-cond-good {
+  padding: 8px 9px;
+  background-color: #D4EDDA;
+  border: 2px solid #28A745;
+}
+
+.retailer-cond-bad {
+  padding: 8px 9px;
+  background-color: #FFE5D0;
+  border: 2px solid #FD7E14;
+}
+
+.retailer-cond-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.retailer-cond-hint {
+  margin: 3px 0 0 0;
+  font-size: 12px;
+  color: #555555;
+}
+
+.retailer-sig-input {
+  font-weight: bold;
+}
+
+
+/* ---------- returns page (Returns.tsx) ---------- */
+
+.retailer-table-box {
+  margin-top: 20px;
+}
+
+.retailer-reason-cell {
+  max-width: 260px;
+}
+
+.retailer-reason-text {
+  margin: 0 0 3px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  color: #555555;
+}
+
+.retailer-refund-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.retailer-refund-amt {
+  font-weight: bold;
+}
+
+/* return side panel */
+.retailer-claim-body {
+  font-size: 14px;
+}
+
+.retailer-claim-body p {
+  margin: 0 0 5px 0;
+}
+
+.retailer-quote {
+  font-style: italic;
+}
+
+.retailer-voucher-body {
+  font-size: 13px;
+}
+
+.retailer-big-number {
+  margin: 0 0 3px 0;
+  font-size: 26px;
+  font-weight: bold;
+  line-height: normal;
+}
+
+
+/* ---------- recall notices page (RecallNotices.tsx) ---------- */
+
+.retailer-recall-list > div {
+  margin-bottom: 16px;
+}
+
+/* red line down the left so you can see which recalls are still active */
+.retailer-recall-active {
+  border-color: #E8A6AD;
+  border-left: 5px solid #DC3545;
+}
+
+/* this card has no header so the body needs some padding on top */
+.retailer-recall-body {
+  padding-top: 14px !important;
+}
+
+.retailer-recall-med {
+  margin: 0;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.retailer-recall-reason {
+  margin: 5px 0 0 0;
+  font-size: 14px;
+}
+
+.retailer-recall-meta {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: #777777;
+}
+
+.retailer-recall-facts {
+  margin-top: 15px;
+}
+
+/* the 3 white boxes (received / returned / notices) */
+.retailer-fact-box {
+  padding: 8px 11px 9px 11px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 3px;
+}
+
+.retailer-fact-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: bold;
+  color: #666666;
+}
+
+.retailer-fact-num {
+  margin: 2px 0 1px 0;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: normal;
+}
+
+.retailer-fact-sub {
+  margin: 0;
+  font-size: 12px;
+  color: #555555;
+}
+
+.retailer-fact-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+
+/* =========================================================
+   night mode (dark theme) for the retailer pages
+   ========================================================= */
+
+/* white boxes that sit inside the grey cards */
+[data-theme="dark"] .retailer-order-box,
+[data-theme="dark"] .retailer-road-item,
+[data-theme="dark"] .retailer-lines-list,
+[data-theme="dark"] .retailer-ship-box,
+[data-theme="dark"] .retailer-fact-box {
+  background-color: #333333 !important;
+  border-color: #555555 !important;
+  color: #E6E6E6;
+}
+
+/* boxes inside the popups / inside other boxes, these are already #333
+   so i made them a bit darker or you cant see them */
+[data-theme="dark"] .retailer-catalog-row,
+[data-theme="dark"] .retailer-sign-lines,
+[data-theme="dark"] .retailer-cond-btn,
+[data-theme="dark"] .retailer-ship-details {
+  background-color: #2B2B2B !important;
+  border-color: #555555 !important;
+  color: #E6E6E6;
+}
+
+[data-theme="dark"] .retailer-road-item:hover {
+  background-color: #4A4A2A !important;
+}
+
+[data-theme="dark"] .retailer-row-picked {
+  background-color: #1F3A57 !important;
+  border-color: #3399FF !important;
+}
+
+[data-theme="dark"] .retailer-cond-off:hover {
+  background-color: #3D3D3D !important;
+}
+
+[data-theme="dark"] .retailer-cond-good {
+  background-color: #1E4D2B !important;
+  border-color: #28A745 !important;
+}
+
+[data-theme="dark"] .retailer-cond-bad {
+  background-color: #4D2E14 !important;
+  border-color: #FD7E14 !important;
+}
+
+/* keep the red line in night mode too (.box-1 makes every border grey) */
+[data-theme="dark"] .retailer-recall-active {
+  border-left-color: #DC3545 !important;
+}
+
+[data-theme="dark"] .retailer-order-box-top,
+[data-theme="dark"] .retailer-alloc-line,
+[data-theme="dark"] .retailer-line-row,
+[data-theme="dark"] .retailer-sign-line-border {
+  border-color: #555555;
+}
+
+[data-theme="dark"] .retailer-order-no,
+[data-theme="dark"] .retailer-subtotal b {
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .retailer-road-title {
+  color: #66B2FF;
+}
+
+/* grey text was too dark on the black background (same thing as main.css) */
+[data-theme="dark"] .retailer-none-text,
+[data-theme="dark"] .retailer-cell-grey,
+[data-theme="dark"] .retailer-cell-sub,
+[data-theme="dark"] .retailer-cell-dash,
+[data-theme="dark"] .retailer-cell-muted,
+[data-theme="dark"] .retailer-small-label,
+[data-theme="dark"] .retailer-grey-line,
+[data-theme="dark"] .retailer-order-meta,
+[data-theme="dark"] .retailer-road-sub,
+[data-theme="dark"] .retailer-latest-sub,
+[data-theme="dark"] .retailer-med-info,
+[data-theme="dark"] .retailer-alloc-brand,
+[data-theme="dark"] .retailer-subtotal,
+[data-theme="dark"] .retailer-lines-empty,
+[data-theme="dark"] .retailer-ship-info,
+[data-theme="dark"] .retailer-ship-sub,
+[data-theme="dark"] .retailer-ship-nomanifest,
+[data-theme="dark"] .retailer-remarks-cell,
+[data-theme="dark"] .retailer-cond-hint,
+[data-theme="dark"] .retailer-reason-text,
+[data-theme="dark"] .retailer-recall-meta,
+[data-theme="dark"] .retailer-fact-label,
+[data-theme="dark"] .retailer-fact-sub {
+  color: #B5B5B5;
+}

@@ -118,7 +118,7 @@ export function FileReturnModal({ open, onClose, presetBatch, presetReason, pres
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="retailer-return-form">
         <Field label="Batch" required hint="Batches delivered to your pharmacy, plus any batch under an active recall.">
           <Select value={batchId} onChange={(e) => setBatchId(e.target.value)}>
             <option value="">Choose a batch…</option>

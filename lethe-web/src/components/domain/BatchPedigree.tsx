@@ -10,7 +10,6 @@ import {
   PackageCheck,
   PackageMinus,
   PackagePlus,
-  Search,
   ShoppingCart,
   Siren,
   Thermometer,
@@ -182,22 +181,22 @@ export function BatchPedigree({ batchId }: { batchId: number }) {
   return (
     <div className="space-y-4">
       <Card>
-        <CardBody className="pt-5">
+        <CardBody className="trace-head-body">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <Code className="text-[13px]">{batch.batch_number}</Code>
+                <Code className="trace-batch-code">{batch.batch_number}</Code>
                 <StatusBadge value={batch.status as BatchStatus} meta={BATCH_STATUS} />
               </div>
-              <p className="mt-2 text-lg font-semibold text-ink">{view.med?.brand_name ?? 'Unknown medicine'}</p>
-              <p className="text-[13px] text-ink-2">
+              <p className="trace-med-name">{view.med?.brand_name ?? 'Unknown medicine'}</p>
+              <p className="trace-med-sub">
                 {view.med?.generic_name}
                 {view.comp ? ` · ${view.comp.active_ingredient} ${view.comp.strength} ${view.comp.dosage_form}` : ''}
               </p>
             </div>
             <ExpiryBadge value={batch.expiry_date} />
           </div>
-          <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="trace-kv-grid grid grid-cols-2 gap-4 sm:grid-cols-4">
             <KV label="Produced">{num(batch.quantity_produced)}</KV>
             <KV label="On hand (network)">{num(onHand)}</KV>
             <KV label="Ordered">{num(view.sold)}</KV>
@@ -218,12 +217,12 @@ export function BatchPedigree({ batchId }: { batchId: number }) {
         <CardHeader title="Current custody" subtitle="Where this batch physically sits right now" />
         <CardBody>
           {view.custody.length === 0 ? (
-            <p className="text-[13px] text-ink-2">No stock of this batch is held in any warehouse.</p>
+            <p className="trace-none-text">No stock of this batch is held in any warehouse.</p>
           ) : (
             <div className="grid gap-2 sm:grid-cols-2">
               {view.custody.map((i) => (
-                <div key={i.inventory_id} className="flex items-center justify-between rounded-xl border border-line bg-surface-2 px-3 py-2.5">
-                  <span className="truncate text-[13px] text-ink">{L.locLabel(i.location_id)}</span>
+                <div key={i.inventory_id} className="trace-custody-item">
+                  <span className="trace-custody-loc">{L.locLabel(i.location_id)}</span>
                   <Badge tone="info">{num(i.available_quantity)} units</Badge>
                 </div>
               ))}
@@ -251,8 +250,7 @@ export function BatchSearch({ onPick, placeholder = 'Search batch number or medi
   const term = q.trim().toLowerCase()
   const matches = all.filter((b) => !term || b.batch_number.toLowerCase().includes(term) || (L.medOf(b)?.brand_name ?? '').toLowerCase().includes(term)).slice(0, 8)
   return (
-    <div className="relative w-full max-w-xl">
-      <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted" />
+    <div className="trace-search-wrap">
       <input
         value={q}
         onChange={(e) => {
@@ -262,10 +260,10 @@ export function BatchSearch({ onPick, placeholder = 'Search batch number or medi
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         placeholder={placeholder}
-        className="h-11 w-full rounded-xl border border-line bg-surface pr-4 pl-10 text-sm text-ink shadow-sm outline-none placeholder:text-muted focus:border-accent focus:ring-[3px] focus:ring-accent/15"
+        className="text-input trace-search-input"
       />
       {open && matches.length > 0 && (
-        <div className="absolute z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-line bg-surface shadow-xl">
+        <div className="trace-search-list">
           {matches.map((b) => (
             <button
               key={b.batch_id}
@@ -275,11 +273,11 @@ export function BatchSearch({ onPick, placeholder = 'Search batch number or medi
                 setQ(b.batch_number)
                 setOpen(false)
               }}
-              className="flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left hover:bg-surface-2"
+              className="trace-search-option"
             >
-              <span className="min-w-0">
-                <span className="block font-mono text-[13px] text-ink">{b.batch_number}</span>
-                <span className="block truncate text-xs text-ink-2">{L.medOf(b)?.brand_name ?? '—'}</span>
+              <span className="trace-pick-text">
+                <span className="trace-batch-no">{b.batch_number}</span>
+                <span className="trace-pick-sub">{L.medOf(b)?.brand_name ?? '—'}</span>
               </span>
               <StatusBadge value={b.status} meta={BATCH_STATUS} />
             </button>

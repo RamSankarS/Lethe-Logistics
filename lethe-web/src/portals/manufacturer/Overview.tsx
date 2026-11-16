@@ -65,10 +65,10 @@ export function Overview() {
       />
 
       {s.expiredReleased.length > 0 && (
-        <Callout tone="critical" title={`${s.expiredReleased.length} expired batch${s.expiredReleased.length > 1 ? 'es are' : ' is'} still marked Released`} className="mb-5">
-          <div className="mt-2 flex flex-wrap items-center gap-3">
+        <Callout tone="critical" title={`${s.expiredReleased.length} expired batch${s.expiredReleased.length > 1 ? 'es are' : ' is'} still marked Released`} className="mfr-expired-alert">
+          <div className="mfr-expired-list">
             {s.expiredReleased.map((b) => (
-              <span key={b.batch_id} className="inline-flex items-center gap-2 rounded-lg bg-surface px-2 py-1">
+              <span key={b.batch_id} className="mfr-expired-item">
                 <Code>{b.batch_number}</Code>
                 <ExpiryBadge value={b.expiry_date} compact />
                 <BatchActions batch={b} size="xs" />
@@ -95,20 +95,20 @@ export function Overview() {
         <Stat label="Active recalls" value={num(s.activeRecalls.length)} sub={`${s.openReturns.length} open returns`} icon={Siren} tone="critical" loading={isLoading} onClick={() => navigate('/manufacturer/recalls')} />
       </StatGrid>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-5">
+      <div className="mfr-row-1 grid gap-5 xl:grid-cols-5">
         <Card className="xl:col-span-3">
           <CardHeader title="Batch status" subtitle="Lifecycle position of every batch you have registered" />
           <CardBody>
             <SegmentedBar parts={statusParts} />
-            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+            <div className="mfr-status-boxes grid gap-2 sm:grid-cols-2">
               {statusParts.map((p) => (
-                <div key={p.key} className="flex items-start gap-2.5 rounded-xl bg-surface-2 px-3 py-2.5">
-                  <span className="mt-1.5 size-2 shrink-0 rounded-full" style={{ background: p.color }} />
+                <div key={p.key} className="mfr-status-box">
+                  <span className="color-square" style={{ background: p.color }} />
                   <div>
-                    <p className="text-[13px] font-medium text-ink">
-                      {p.label} <span className="text-ink-2 tabular">· {p.value}</span>
+                    <p className="mfr-status-name">
+                      {p.label} <span className="mfr-grey-text">· {p.value}</span>
                     </p>
-                    <p className="text-xs text-ink-2">{BATCH_STATUS[p.key as keyof typeof BATCH_STATUS].hint}</p>
+                    <p className="mfr-status-hint">{BATCH_STATUS[p.key as keyof typeof BATCH_STATUS].hint}</p>
                   </div>
                 </div>
               ))}
@@ -124,21 +124,21 @@ export function Overview() {
         </Card>
       </div>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-5">
+      <div className="mfr-row-2 grid gap-5 xl:grid-cols-5">
         <Card className="xl:col-span-3">
           <CardHeader title="Expiry watch" subtitle="Active batches expiring within 18 months, soonest first" icon={AlertOctagon} />
-          <CardBody className="px-0 pb-2">
+          <CardBody className="mfr-list-body">
             {s.expiring.length === 0 ? (
               <EmptyState title="Nothing expiring soon" />
             ) : (
-              <div className="divide-y divide-line">
+              <div className="mfr-expiry-list">
                 {s.expiring.slice(0, 7).map((b) => (
-                  <div key={b.batch_id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-2.5">
+                  <div key={b.batch_id} className="mfr-expiry-row">
                     <div className="min-w-0">
                       <Code>{b.batch_number}</Code>
-                      <span className="ml-2 text-[13px] text-ink-2">{L.medOf(b)?.brand_name}</span>
+                      <span className="mfr-expiry-med">{L.medOf(b)?.brand_name}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="mfr-expiry-tags">
                       <StatusBadge value={b.status} meta={BATCH_STATUS} />
                       <ExpiryBadge value={b.expiry_date} />
                     </div>
@@ -151,22 +151,22 @@ export function Overview() {
 
         <Card className="xl:col-span-2">
           <CardHeader title="Recent batch & recall events" subtitle="Live from the governance ledger" />
-          <CardBody className="px-0 pb-2">
+          <CardBody className="mfr-list-body">
             {(feed.data ?? []).length === 0 ? (
               <EmptyState title="No events yet" />
             ) : (
-              <ul className="divide-y divide-line">
+              <ul className="mfr-event-list">
                 {(feed.data ?? []).map((e) => {
                   const p = (e.event_payload ?? {}) as Record<string, string>
                   return (
-                    <li key={e.log_id} className="px-5 py-2.5">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="truncate text-[13px] font-medium text-ink">{humanize(e.action_type)}</span>
+                    <li key={e.log_id} className="mfr-event-item">
+                      <div className="mfr-event-top">
+                        <span className="mfr-event-name">{humanize(e.action_type)}</span>
                         <Badge tone={SEVERITY_TONE[severityOf(e)]} dot>
                           {severityOf(e).toLowerCase()}
                         </Badge>
                       </div>
-                      <p className="mt-0.5 truncate text-xs text-ink-2">
+                      <p className="mfr-event-sub">
                         {p.description ?? p.reason ?? p.batch_number ?? L.userName(e.user_id)} · {relative(e.log_time_stamp_utc)}
                       </p>
                     </li>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ArrowRightLeft, History, PackageMinus, PackagePlus, Snowflake, Sun } from 'lucide-react'
+import { ArrowRightLeft, PackageMinus, PackagePlus, Snowflake, Sun } from 'lucide-react'
 import { useProfile } from '@/auth/AuthProvider'
 import { logEvent, useRunner } from '@/data/actions'
 import { useLookups, useTables } from '@/data/hooks'
@@ -106,7 +106,7 @@ function MoveStock({ kind, row, onClose }: { kind: MoveKind | null; row?: Invent
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="dist-modal-stack">
         {kind === 'Inbound' && (
           <Field label="Batch" required>
             <Select value={batchId} onChange={(e) => setBatchId(e.target.value)}>
@@ -168,23 +168,19 @@ function LocationCard({ v, selected, onClick }: { v: LocationView; selected: boo
   return (
     <button
       onClick={onClick}
-      className={cn(
-        'rounded-2xl border bg-surface p-3.5 text-left transition-colors',
-        selected ? 'border-accent ring-[3px] ring-accent/15' : 'border-line hover:border-line-strong',
-        !v.loc.is_active && 'opacity-55',
-      )}
+      className={cn('dist-loc-box', selected && 'dist-loc-selected', !v.loc.is_active && 'dist-faded')}
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink">
-          {cold ? <Snowflake className="size-4 text-info-text" /> : <Sun className="size-4 text-warn-text" />}L{v.loc.location_id} · {v.loc.zone_type}
+      <div className="dist-loc-top">
+        <span className="dist-loc-name">
+          {cold ? <Snowflake className="dist-zone-icon dist-icon-cold" /> : <Sun className="dist-zone-icon dist-icon-warm" />}L{v.loc.location_id} · {v.loc.zone_type}
         </span>
         {!v.loc.is_active ? <Badge>Inactive</Badge> : breach ? <Badge tone="critical" dot>Breach</Badge> : v.state === 'ok' ? <Badge tone="good" dot>In range</Badge> : <Badge>No sensor</Badge>}
       </div>
-      <p className="mt-1 text-xs text-ink-2 tabular">
+      <p className="dist-loc-target">
         Target {v.loc.target_min_temp}–{v.loc.target_max_temp}°C · ≤{v.loc.target_humidity_limit}% RH
         {v.reading && <> · now {temp(v.reading.temperature_celsius)}</>}
       </p>
-      <div className="mt-3 mb-1 flex justify-between text-[12px] text-ink-2 tabular">
+      <div className="dist-loc-count">
         <span>{plural(v.items.length, 'batch', 'batches')}</span>
         <span>
           {num(v.stock)} / {num(v.loc.max_capacity)}
@@ -218,20 +214,20 @@ export function Inventory() {
   const cols: Column<InventoryRow>[] = [
     { key: 'batch', header: 'Batch', sort: (i) => L.batchNo(i.batch_id), cell: (i) => <Code>{L.batchNo(i.batch_id)}</Code> },
     { key: 'med', header: 'Medicine', sort: (i) => L.medName(i.batch_id), cell: (i) => <MedicineCell med={L.medOf(L.batchOf(i.batch_id))} /> },
-    { key: 'loc', header: 'Location', sort: (i) => L.locLabel(i.location_id), cell: (i) => <span className="text-[13px] text-ink-2">{L.locLabel(i.location_id)}</span>, hideBelow: 'md' },
-    { key: 'qty', header: 'On hand', align: 'right', sort: (i) => i.available_quantity, cell: (i) => <span className="font-semibold">{num(i.available_quantity)}</span> },
+    { key: 'loc', header: 'Location', sort: (i) => L.locLabel(i.location_id), cell: (i) => <span className="dist-cell-grey">{L.locLabel(i.location_id)}</span>, hideBelow: 'md' },
+    { key: 'qty', header: 'On hand', align: 'right', sort: (i) => i.available_quantity, cell: (i) => <span className="dist-bold">{num(i.available_quantity)}</span> },
     { key: 'status', header: 'Batch status', sort: (i) => L.batchOf(i.batch_id)?.status ?? '', cell: (i) => <StatusBadge value={L.batchOf(i.batch_id)?.status} meta={BATCH_STATUS} /> },
     { key: 'exp', header: 'Expiry', sort: (i) => L.batchOf(i.batch_id)?.expiry_date ?? '', cell: (i) => (L.batchOf(i.batch_id) ? <ExpiryBadge value={L.batchOf(i.batch_id)!.expiry_date} compact /> : '—'), hideBelow: 'lg' },
-    { key: 'verified', header: 'Last verified', sort: (i) => i.last_update, cell: (i) => <span className="text-xs text-ink-2">{L.userName(i.last_verified_by)} · {relative(i.last_update)}</span>, hideBelow: 'xl' },
+    { key: 'verified', header: 'Last verified', sort: (i) => i.last_update, cell: (i) => <span className="dist-tiny-grey">{L.userName(i.last_verified_by)} · {relative(i.last_update)}</span>, hideBelow: 'xl' },
     {
       key: 'act',
       header: '',
       cell: (i) => (
-        <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+        <div className="dist-action-btns dist-btns-right" onClick={(e) => e.stopPropagation()}>
           <Button size="xs" variant="ghost" icon={ArrowRightLeft} onClick={() => setMove({ kind: 'Internal', row: i })}>
             Move
           </Button>
-          <Button size="xs" variant="ghost" icon={PackageMinus} onClick={() => setMove({ kind: 'Outbound', row: i })} className="text-critical-text hover:bg-critical-soft">
+          <Button size="xs" variant="ghost" icon={PackageMinus} onClick={() => setMove({ kind: 'Outbound', row: i })} className="dist-red-link">
             Remove
           </Button>
         </div>
@@ -242,11 +238,11 @@ export function Inventory() {
   const histCols: Column<StockMovement>[] = [
     { key: 'type', header: 'Type', sort: (mv) => mv.movement_type, cell: (mv) => <Badge tone={mv.movement_type === 'Inbound' ? 'good' : mv.movement_type === 'Outbound' ? 'serious' : 'info'} icon={mv.movement_type === 'Inbound' ? PackagePlus : mv.movement_type === 'Outbound' ? PackageMinus : ArrowRightLeft}>{mv.movement_type}</Badge> },
     { key: 'batch', header: 'Batch', sort: (mv) => L.batchNo(mv.batch_id), cell: (mv) => <Code>{L.batchNo(mv.batch_id)}</Code> },
-    { key: 'from', header: 'From', cell: (mv) => <span className="text-[13px] text-ink-2">{mv.source_location_id ? L.locLabel(mv.source_location_id) : 'Supplier'}</span>, hideBelow: 'md' },
-    { key: 'to', header: 'To', cell: (mv) => <span className="text-[13px] text-ink-2">{mv.destination_location_id ? L.locLabel(mv.destination_location_id) : 'Out of network'}</span>, hideBelow: 'md' },
+    { key: 'from', header: 'From', cell: (mv) => <span className="dist-cell-grey">{mv.source_location_id ? L.locLabel(mv.source_location_id) : 'Supplier'}</span>, hideBelow: 'md' },
+    { key: 'to', header: 'To', cell: (mv) => <span className="dist-cell-grey">{mv.destination_location_id ? L.locLabel(mv.destination_location_id) : 'Out of network'}</span>, hideBelow: 'md' },
     { key: 'qty', header: 'Units', align: 'right', sort: (mv) => mv.quantity_moved, cell: (mv) => num(mv.quantity_moved) },
-    { key: 'by', header: 'By', cell: (mv) => <span className="text-[13px] text-ink-2">{L.userName(mv.user_id)}</span>, hideBelow: 'lg' },
-    { key: 'at', header: 'When', sort: (mv) => mv.moved_at, cell: (mv) => <span className="text-[13px] text-ink-2 tabular">{dateTime(mv.moved_at)}</span> },
+    { key: 'by', header: 'By', cell: (mv) => <span className="dist-cell-grey">{L.userName(mv.user_id)}</span>, hideBelow: 'lg' },
+    { key: 'at', header: 'When', sort: (mv) => mv.moved_at, cell: (mv) => <span className="dist-cell-grey">{dateTime(mv.moved_at)}</span> },
   ]
 
   return (
@@ -259,7 +255,7 @@ export function Inventory() {
         }
       />
 
-      <div className="mb-4 flex flex-wrap items-center gap-3">
+      <div className="dist-filter-row">
         <Segmented
           value={wh}
           onChange={(v) => {
@@ -270,19 +266,19 @@ export function Inventory() {
         />
       </div>
 
-      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+      <div className="dist-loc-grid grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {locs.map((v) => (
           <LocationCard key={v.loc.location_id} v={v} selected={locId === v.loc.location_id} onClick={() => setLocId(locId === v.loc.location_id ? null : v.loc.location_id)} />
         ))}
       </div>
 
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+      <div className="dist-table-top">
         <Segmented
           value={view}
           onChange={setView}
           options={[
             { value: 'stock', label: 'Stock on hand', count: rows.length },
-            { value: 'history', label: <span className="inline-flex items-center gap-1.5"><History className="size-3.5" />Movement history</span>, count: movements.length },
+            { value: 'history', label: 'Movement history', count: movements.length },
           ]}
         />
         {locId != null && (

@@ -2,47 +2,53 @@ import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import type { StatusMeta, Tone } from '@/lib/domain'
-import { TONE } from './tone'
+
+// css class for each colour
+const TAG_COLOUR: Record<Tone, string> = {
+  neutral: 'tag-grey',
+  info: 'tag-teal',
+  good: 'tag-green',
+  warn: 'tag-yellow',
+  serious: 'tag-orange',
+  critical: 'tag-red',
+  accent: 'tag-blue',
+}
 
 export function Badge({
   tone = 'neutral',
   icon: Icon,
-  dot,
   children,
   className,
   title,
 }: {
   tone?: Tone
   icon?: LucideIcon
+  /** not used any more */
   dot?: boolean
   children: ReactNode
   className?: string
   title?: string
 }) {
-  const t = TONE[tone]
   return (
-    <span
-      title={title}
-      className={cn('inline-flex max-w-full items-center gap-1.5 rounded-full px-2 py-0.5 text-xs leading-5 font-medium whitespace-nowrap', t.soft, t.text, className)}
-    >
-      {Icon ? <Icon className="size-3.5 shrink-0" /> : dot ? <span className={cn('size-1.5 shrink-0 rounded-full', t.dot)} /> : null}
-      <span className="truncate">{children}</span>
+    <span title={title} className={cn('label-tag', TAG_COLOUR[tone], className)}>
+      {Icon && <Icon />}
+      <span>{children}</span>
     </span>
   )
 }
 
-/** A status from one of the domain status maps (always dot + label, never colour alone). */
+/** A status from one of the domain status maps. */
 export function StatusBadge<K extends string>({ value, meta, icon }: { value: K | null | undefined; meta: Record<K, StatusMeta>; icon?: LucideIcon }) {
   if (!value) return <Badge>—</Badge>
   const m = meta[value] ?? { label: String(value), tone: 'neutral' as Tone }
   return (
-    <Badge tone={m.tone} dot={!icon} icon={icon} title={m.hint}>
+    <Badge tone={m.tone} icon={icon} title={m.hint}>
       {m.label}
     </Badge>
   )
 }
 
-/** Monospace chip for IDs, batch numbers and hashes. */
+/** Monospace text for IDs, batch numbers and hashes. */
 export function Code({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn('rounded-md bg-surface-3 px-1.5 py-0.5 font-mono text-[12px] whitespace-nowrap text-ink', className)}>{children}</span>
+  return <span className={cn('code-text', className)}>{children}</span>
 }
