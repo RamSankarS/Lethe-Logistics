@@ -27,11 +27,11 @@ export function TraceWorkbench({ scope }: { scope?: Set<number> }) {
 
   return (
     <div className="grid gap-5 xl:grid-cols-[320px_1fr]">
-      <div className="space-y-4">
+      <div>
         <BatchSearch onPick={setPicked} />
-        <Card className="p-2">
-          <p className="px-3 pt-2 pb-1 text-[11.5px] font-semibold tracking-wide text-muted uppercase">Batches worth investigating</p>
-          {quick.length === 0 && <p className="px-3 py-2 text-[13px] text-ink-2">No flagged batches.</p>}
+        <Card className="trace-pick-box">
+          <p className="trace-pick-title">Batches worth investigating</p>
+          {quick.length === 0 && <p className="trace-none-text">No flagged batches.</p>}
           {quick.map((q) => {
             const b = L.batchOf(q.id)
             if (!b) return null
@@ -39,11 +39,11 @@ export function TraceWorkbench({ scope }: { scope?: Set<number> }) {
               <button
                 key={q.id}
                 onClick={() => setPicked(q.id)}
-                className={cn('flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-left transition-colors', current === q.id ? 'bg-accent-soft' : 'hover:bg-surface-2')}
+                className={cn('trace-pick-row', current === q.id ? 'trace-pick-row-on' : 'trace-pick-row-off')}
               >
-                <span className="min-w-0">
-                  <span className="block truncate font-mono text-[13px] text-ink">{b.batch_number}</span>
-                  <span className="block truncate text-xs text-ink-2">
+                <span className="trace-pick-text">
+                  <span className="trace-batch-no">{b.batch_number}</span>
+                  <span className="trace-pick-sub">
                     {L.medOf(b)?.brand_name} · {q.why}
                   </span>
                 </span>

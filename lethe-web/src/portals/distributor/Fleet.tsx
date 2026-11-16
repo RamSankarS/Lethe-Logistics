@@ -60,9 +60,9 @@ function AddVehicle({ open, onClose }: { open: boolean; onClose: () => void }) {
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="dist-modal-stack">
         <Field label="Registration number" required error={dup ? 'Already registered.' : undefined}>
-          <Input value={no} onChange={(e) => setNo(e.target.value)} placeholder="MP-04-RF-3344" className="font-mono uppercase" />
+          <Input value={no} onChange={(e) => setNo(e.target.value)} placeholder="MP-04-RF-3344" className="dist-reg-input" />
         </Field>
         <Field label="Vehicle type" required hint="Reefers are refrigerated and required for cold-chain medicines.">
           <Select value={type} onChange={(e) => setType(e.target.value)}>
@@ -110,16 +110,16 @@ export function Fleet() {
   const cols: Column<Row>[] = [
     { key: 'no', header: 'Vehicle', sort: (r) => r.v.vehicle_no, cell: (r) => <Code>{r.v.vehicle_no}</Code> },
     { key: 'type', header: 'Type', sort: (r) => r.v.vehicle_type, cell: (r) => (r.v.vehicle_type === 'Reefer' ? <Badge tone="info" icon={Snowflake}>Reefer</Badge> : <Badge icon={Truck}>{r.v.vehicle_type}</Badge>) },
-    { key: 'org', header: 'Transporter', sort: (r) => L.orgName(r.v.transporter_org_id), cell: (r) => <span className="text-[13px]">{L.orgName(r.v.transporter_org_id)}</span> },
+    { key: 'org', header: 'Transporter', sort: (r) => L.orgName(r.v.transporter_org_id), cell: (r) => <span className="dist-cell-text">{L.orgName(r.v.transporter_org_id)}</span> },
     {
       key: 'current',
       header: 'Current assignment',
       cell: (r) =>
         r.current ? (
-          <div className="text-[13px]">
-            <span className="font-medium text-ink">Order #{r.current.order_id}</span>{' '}
+          <div className="dist-cell-text">
+            <span className="dist-bold">Order #{r.current.order_id}</span>{' '}
             <StatusBadge value={r.current.manifest_status} meta={MANIFEST_STATUS} />
-            <p className="text-xs text-ink-2">
+            <p className="dist-tiny-grey">
               {L.userName(r.current.driver_user_id)} · ETA {r.current.estimated_arrival_time ? relative(r.current.estimated_arrival_time) : 'n/a'}
             </p>
           </div>
@@ -130,7 +130,7 @@ export function Fleet() {
         ),
     },
     { key: 'trips', header: 'Trips', align: 'right', sort: (r) => r.trips, cell: (r) => num(r.trips) },
-    { key: 'since', header: 'Registered', sort: (r) => r.v.created_at_utc, cell: (r) => <span className="text-[13px] text-ink-2">{dateTime(r.v.created_at_utc)}</span>, hideBelow: 'lg' },
+    { key: 'since', header: 'Registered', sort: (r) => r.v.created_at_utc, cell: (r) => <span className="dist-cell-grey">{dateTime(r.v.created_at_utc)}</span>, hideBelow: 'lg' },
   ]
 
   const reefers = t.data.vehicles.filter((v: Vehicle) => v.vehicle_type === 'Reefer').length
@@ -146,22 +146,22 @@ export function Fleet() {
         <Stat label="On a trip" value={num(onTrip)} sub={`${t.data.vehicles.length - onTrip} available`} icon={Clock} tone="accent" />
         <Stat label="Delayed" value={num(delayed)} sub="manifests flagged late" icon={Clock} tone="serious" />
       </StatGrid>
-      <Card className="mt-5">
+      <Card className="dist-card-gap">
         <CardHeader title="Vehicle registry" subtitle="forward_fulfillment.vehicle_fleet_registry with live manifest assignments" />
         <DataTable bare rows={model} columns={cols} rowKey={(r) => r.v.vehicle_id} loading={t.isLoading} searchText={(r) => `${r.v.vehicle_no} ${r.v.vehicle_type} ${L.orgName(r.v.transporter_org_id)}`} />
       </Card>
-      <Card className="mt-5">
+      <Card className="dist-card-gap-2">
         <CardHeader title="Drivers" subtitle="Users belonging to transporter organisations" icon={UserRound} />
-        <div className="grid gap-2 px-5 pb-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="dist-driver-grid grid sm:grid-cols-2 xl:grid-cols-3">
           {drivers.map((u) => {
             const trip = model.find((r) => r.current?.driver_user_id === u.user_id)
             return (
-              <div key={u.user_id} className="flex items-center justify-between rounded-xl border border-line px-3 py-2.5">
+              <div key={u.user_id} className="dist-driver-box">
                 <div>
-                  <p className="text-[13.5px] font-medium text-ink">
+                  <p className="dist-driver-name">
                     {u.first_name} {u.last_name}
                   </p>
-                  <p className="text-xs text-ink-2">{L.orgName(u.org_id)}</p>
+                  <p className="dist-tiny-grey">{L.orgName(u.org_id)}</p>
                 </div>
                 {!u.is_active ? <Badge>Inactive</Badge> : trip ? <Badge tone="info">Driving {trip.v.vehicle_no}</Badge> : <Badge tone="good" dot>Free</Badge>}
               </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, Download, FilterX, Fingerprint, Lock, Search, ShieldCheck, ShieldX } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Download, FilterX, Fingerprint, Lock, ShieldCheck, ShieldX } from 'lucide-react'
 import { EMPTY_AUDIT_FILTERS, useAuditActionTypes, useAuditPage, type AuditFilters } from '@/data/audit'
 import { useLookups, useTables } from '@/data/hooks'
 import { db } from '@/lib/supabase'
@@ -51,23 +51,23 @@ function TamperTest() {
   return (
     <Card>
       <CardHeader title="Ledger integrity" subtitle="Write-once, read-many (WORM) protection" icon={Fingerprint} />
-      <CardBody className="space-y-3">
-        <p className="text-[13px] leading-5 text-ink-2">
+      <CardBody>
+        <p className="comp-tamper-text">
           This test tries to modify the newest ledger row (re-writing it with its own value, so nothing can change). The database should refuse.
         </p>
         <Button variant="primary" icon={Lock} loading={state === 'running'} onClick={() => void runTest()}>
           Run tamper test
         </Button>
         {state === 'blocked' && (
-          <Callout tone="good" icon={ShieldCheck} title="Tamper attempt blocked">
+          <Callout tone="good" icon={ShieldCheck} title="Tamper attempt blocked" className="comp-tamper-result">
             <span className="block">
               Target: <Code>{shortId(target?.log_id)}</Code> {humanize(target?.action_type)}
             </span>
-            <span className="mt-1 block font-mono text-xs text-ink">“{message}”</span>
+            <span className="comp-db-message">“{message}”</span>
           </Callout>
         )}
         {state === 'open' && (
-          <Callout tone="critical" icon={ShieldX} title="Ledger is not protected">
+          <Callout tone="critical" icon={ShieldX} title="Ledger is not protected" className="comp-tamper-result">
             {message}
           </Callout>
         )}
@@ -125,7 +125,7 @@ export function AuditLedger() {
       <PageHeader actions={<Button icon={Download} loading={exporting} disabled={!total} onClick={() => void exportAll()}>Export CSV</Button>} />
       <div className="grid gap-5 2xl:grid-cols-[1fr_340px]">
         <div className="min-w-0 space-y-4">
-          <Card className="p-4">
+          <Card className="comp-filter-box">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
               <Field label="Search" className="xl:col-span-2">
                 <form
@@ -133,10 +133,8 @@ export function AuditLedger() {
                     e.preventDefault()
                     apply(draft)
                   }}
-                  className="relative"
                 >
-                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" />
-                  <Input value={draft.search} onChange={set('search')} onBlur={() => apply(draft)} placeholder="Action, batch, reason, IP… (Enter)" className="pl-9" />
+                  <Input value={draft.search} onChange={set('search')} onBlur={() => apply(draft)} placeholder="Action, batch, reason, IP… (Enter)" />
                 </form>
               </Field>
               <Field label="Module">
@@ -202,57 +200,57 @@ export function AuditLedger() {
           </Card>
 
           <Card className="overflow-hidden">
-            <div className="flex items-center justify-between border-b border-line px-4 py-3 text-[13px] text-ink-2">
+            <div className="comp-ledger-topbar">
               <span>
-                <b className="text-ink tabular">{num(total)}</b> events{active ? ' match your filters' : ' in the ledger'}
+                <b>{num(total)}</b> events{active ? ' match your filters' : ' in the ledger'}
               </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Lock className="size-3.5" /> Append-only
+              <span className="comp-append-note">
+                <Lock className="comp-lock-icon" /> Append-only
               </span>
             </div>
             {q.error ? (
               <ErrorState error={q.error} onRetry={() => void q.refetch()} />
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[760px] text-left text-[13px]">
+              <div className="table-scroll">
+                <table className="my-table comp-ledger-table">
                   <thead>
-                    <tr className="border-b border-line bg-surface-2 text-[11.5px] tracking-wide text-muted uppercase">
-                      <th className="px-4 py-2.5 font-semibold">Time (UTC)</th>
-                      <th className="px-4 py-2.5 font-semibold">Module</th>
-                      <th className="px-4 py-2.5 font-semibold">Action</th>
-                      <th className="px-4 py-2.5 font-semibold">Severity</th>
-                      <th className="px-4 py-2.5 font-semibold">Actor</th>
-                      <th className="hidden px-4 py-2.5 font-semibold lg:table-cell">Detail</th>
+                    <tr>
+                      <th>Time (UTC)</th>
+                      <th>Module</th>
+                      <th>Action</th>
+                      <th>Severity</th>
+                      <th>Actor</th>
+                      <th className="hidden lg:table-cell">Detail</th>
                     </tr>
                   </thead>
-                  <tbody className={q.isFetching ? 'opacity-60 transition-opacity' : ''}>
+                  <tbody className={q.isFetching ? 'comp-fetching' : ''}>
                     {(q.data?.rows ?? []).map((r) => {
                       const sev = severityOf(r)
                       const p = (r.event_payload ?? {}) as Record<string, unknown>
                       const detail = p.description ?? p.reason ?? (p.batch_number ? `Batch ${p.batch_number}` : null) ?? (p.disposal_method ? `Method ${p.disposal_method}` : null)
                       return (
-                        <tr key={r.log_id} onClick={() => setOpen(r)} className="cursor-pointer border-b border-line last:border-0 hover:bg-surface-2">
-                          <td className="px-4 py-2.5 whitespace-nowrap text-ink-2 tabular">{dateTime(r.log_time_stamp_utc)}</td>
-                          <td className="px-4 py-2.5 whitespace-nowrap text-ink-2">{moduleLabel(r.source_module)}</td>
-                          <td className="px-4 py-2.5 font-medium whitespace-nowrap text-ink">{humanize(r.action_type)}</td>
-                          <td className="px-4 py-2.5">
+                        <tr key={r.log_id} onClick={() => setOpen(r)} className="clickable-row">
+                          <td className="comp-td-grey">{dateTime(r.log_time_stamp_utc)}</td>
+                          <td className="comp-td-grey">{moduleLabel(r.source_module)}</td>
+                          <td className="comp-td-action">{humanize(r.action_type)}</td>
+                          <td>
                             <Badge tone={SEVERITY_TONE[sev]} dot>
                               {sev.toLowerCase()}
                             </Badge>
                           </td>
-                          <td className="px-4 py-2.5 whitespace-nowrap text-ink-2">{r.user_id ? L.userName(r.user_id) : 'System'}</td>
-                          <td className="hidden max-w-[320px] truncate px-4 py-2.5 text-ink-2 lg:table-cell">{detail ? String(detail) : r.ip_address ?? '—'}</td>
+                          <td className="comp-td-grey">{r.user_id ? L.userName(r.user_id) : 'System'}</td>
+                          <td className="hidden lg:table-cell comp-td-detail">{detail ? String(detail) : r.ip_address ?? '—'}</td>
                         </tr>
                       )
                     })}
                   </tbody>
                 </table>
                 {!q.isLoading && (q.data?.rows.length ?? 0) === 0 && <EmptyState title="No events match" />}
-                {q.isLoading && <div className="p-10 text-center text-sm text-ink-2">Loading ledger…</div>}
+                {q.isLoading && <div className="loading-text">Loading ledger…</div>}
               </div>
             )}
-            <div className="flex items-center justify-between border-t border-line px-4 py-2.5 text-[13px] text-ink-2">
-              <span className="tabular">
+            <div className="comp-pager">
+              <span>
                 Page {page + 1} of {pages}
               </span>
               <div className="flex gap-1">
@@ -267,13 +265,13 @@ export function AuditLedger() {
           <TamperTest />
           <Card>
             <CardHeader title="Severity legend" />
-            <CardBody className="space-y-2 text-[12.5px]">
+            <CardBody className="comp-legend-body">
               {(SEVERITIES as Severity[]).map((s) => (
-                <div key={s} className="flex items-center justify-between gap-2">
+                <div key={s} className="comp-legend-row">
                   <Badge tone={SEVERITY_TONE[s]} dot>
                     {s.toLowerCase()}
                   </Badge>
-                  <span className="text-right text-ink-2">
+                  <span className="comp-legend-text">
                     {s === 'CRITICAL' ? 'Recalls, spec tampering' : s === 'HIGH' ? 'Destruction, breaches, RBAC changes' : s === 'MEDIUM' ? 'Key rotation, QC passes' : s === 'LOW' ? 'Routine state changes' : 'Logins, views, reports'}
                   </span>
                 </div>
@@ -287,32 +285,32 @@ export function AuditLedger() {
         {open && (
           <div className="space-y-4">
             <Card>
-              <CardBody className="grid grid-cols-2 gap-4 pt-5 text-[13px]">
+              <CardBody className="comp-log-facts grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-[11.5px] tracking-wide text-muted uppercase">Log ID</p>
-                  <p className="font-mono text-xs break-all text-ink">{open.log_id}</p>
+                  <p className="comp-fact-label">Log ID</p>
+                  <p className="comp-log-id">{open.log_id}</p>
                 </div>
                 <div>
-                  <p className="text-[11.5px] tracking-wide text-muted uppercase">Severity</p>
+                  <p className="comp-fact-label">Severity</p>
                   <Badge tone={SEVERITY_TONE[severityOf(open)]} dot>
                     {severityOf(open).toLowerCase()}
                   </Badge>
                 </div>
                 <div>
-                  <p className="text-[11.5px] tracking-wide text-muted uppercase">Actor</p>
-                  <p className="text-ink">{open.user_id ? L.userName(open.user_id) : 'System'}</p>
-                  {open.user_id && <p className="text-xs text-ink-2">{L.orgName(L.user.get(open.user_id)?.org_id)}</p>}
+                  <p className="comp-fact-label">Actor</p>
+                  <p>{open.user_id ? L.userName(open.user_id) : 'System'}</p>
+                  {open.user_id && <p className="comp-small-grey">{L.orgName(L.user.get(open.user_id)?.org_id)}</p>}
                 </div>
                 <div>
-                  <p className="text-[11.5px] tracking-wide text-muted uppercase">Source IP</p>
-                  <p className="font-mono text-ink">{open.ip_address ?? '—'}</p>
+                  <p className="comp-fact-label">Source IP</p>
+                  <p className="comp-mono">{open.ip_address ?? '—'}</p>
                 </div>
               </CardBody>
             </Card>
             <Card>
               <CardHeader title="Event payload" subtitle="Stored as JSONB, exactly as written" />
               <CardBody>
-                <pre className="max-h-[420px] overflow-auto rounded-xl bg-surface-2 p-4 font-mono text-[12px] leading-5 text-ink">{JSON.stringify(open.event_payload ?? {}, null, 2)}</pre>
+                <pre className="comp-json-box">{JSON.stringify(open.event_payload ?? {}, null, 2)}</pre>
               </CardBody>
             </Card>
             <Callout tone="neutral" icon={Lock}>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { FlaskConical, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useProfile } from '@/auth/AuthProvider'
 import { useRunner } from '@/data/actions'
 import { useLookups, useTables } from '@/data/hooks'
@@ -120,7 +120,7 @@ function RegisterBatch({ open, onClose }: { open: boolean; onClose: () => void }
           </Select>
         </Field>
         <Field label="Batch number" required error={dup ? 'This batch number already exists.' : undefined} hint="Suggested from the brand name; must be unique.">
-          <Input value={batchNo} onChange={(e) => setBatchNo(e.target.value)} placeholder="B-AMX-2026-03" className="font-mono" />
+          <Input value={batchNo} onChange={(e) => setBatchNo(e.target.value)} placeholder="B-AMX-2026-03" className="mfr-batch-input" />
         </Field>
         <Field label="Quantity produced" required error={!qtyOk ? 'Must be greater than zero.' : undefined}>
           <Input type="number" min={1} step={100} value={qty} onChange={(e) => setQty(e.target.value)} />
@@ -133,7 +133,7 @@ function RegisterBatch({ open, onClose }: { open: boolean; onClose: () => void }
         </Field>
       </FormGrid>
       {med && (
-        <Callout tone="info" className="mt-5" title="Storage requirement">
+        <Callout tone="info" className="mfr-storage-note" title="Storage requirement">
           <StorageBand pkg={L.pkgByMed.get(med.medicine_id)} />. Warehouses will only accept this batch into zones that match.
         </Callout>
       )}
@@ -162,8 +162,8 @@ export function Batches() {
     { key: 'medicine', header: 'Medicine', sort: (b) => L.medOf(b)?.brand_name ?? '', cell: (b) => <MedicineCell med={L.medOf(b)} /> },
     { key: 'status', header: 'Status', sort: (b) => b.status, cell: (b) => <StatusBadge value={b.status} meta={BATCH_STATUS} /> },
     { key: 'qty', header: 'Produced', align: 'right', sort: (b) => Number(b.quantity_produced), cell: (b) => num(b.quantity_produced) },
-    { key: 'stock', header: 'In network', align: 'right', sort: (b) => stock.get(b.batch_id) ?? 0, cell: (b) => <span className="text-ink-2">{num(stock.get(b.batch_id) ?? 0)}</span>, hideBelow: 'md' },
-    { key: 'mfg', header: 'Mfg date', sort: (b) => b.mfg_date, cell: (b) => <span className="text-ink-2 tabular">{date(b.mfg_date)}</span>, hideBelow: 'lg' },
+    { key: 'stock', header: 'In network', align: 'right', sort: (b) => stock.get(b.batch_id) ?? 0, cell: (b) => <span className="mfr-grey-text">{num(stock.get(b.batch_id) ?? 0)}</span>, hideBelow: 'md' },
+    { key: 'mfg', header: 'Mfg date', sort: (b) => b.mfg_date, cell: (b) => <span className="mfr-date-text">{date(b.mfg_date)}</span>, hideBelow: 'lg' },
     { key: 'exp', header: 'Expiry', sort: (b) => b.expiry_date, cell: (b) => <ExpiryBadge value={b.expiry_date} /> },
     { key: 'actions', header: 'QC workflow', cell: (b) => <BatchActions batch={b} size="xs" /> },
   ]
@@ -178,7 +178,7 @@ export function Batches() {
         }
       />
 
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="mfr-filter-row">
         <Segmented<Filter>
           value={filter}
           onChange={setFilter}
@@ -191,8 +191,8 @@ export function Batches() {
             { value: 'Recalled', label: 'Recalled', count: counts.Recalled ?? 0 },
           ]}
         />
-        <p className="flex items-center gap-1.5 text-[12.5px] text-ink-2">
-          <FlaskConical className="size-4 text-accent-text" /> Pending → Quality check → Released. Rejected and recalled batches are locked by the database.
+        <p className="mfr-hint-text">
+          Pending → Quality check → Released. Rejected and recalled batches are locked by the database.
         </p>
       </div>
 

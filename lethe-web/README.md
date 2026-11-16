@@ -61,7 +61,8 @@ Browser (React 19 + Vite + TypeScript + Tailwind 4)
 * **Business rules stay in the database.** The UI pre-validates (e.g. only offers storage zones whose temperature band fits the medicine), but the ~20 triggers remain the source of truth. When a trigger refuses something (`SAFETY LOCK…`, `Governance Violation…`) the app shows it as a *"blocked by a database rule"* toast with the trigger's own message. Row Level Security refusals show as *"Blocked by row-level security"*, and an update that changed nothing (RLS filtered it, or the record had moved on) reports *"Nothing was changed"* instead of a false success.
 * **Audit trail**: triggers already log batches, recalls, disposals, sessions and users. For actions without a trigger (orders, dispatches, stock moves, RBAC changes, quarantine decisions…) the app appends an event to `identity_mod.auth_audit_logs` with a severity, so the Compliance portal sees everything.
 * **Data layer**: TanStack Query caches each table (`src/data/tables.ts` is the registry), refreshes every 60 s and after every write. Cross-schema joins are done client-side because PostgREST cannot embed across schemas.
-* **Charts** follow one validated colour system (Recharts), with light and dark themes.
+* **Look**: deliberately plain, hand-written CSS in `src/styles/` (`main.css` for shared classes plus one file per portal), loaded into Tailwind's components layer so the remaining Tailwind classes still apply. System fonts, Bootstrap-style colours, light and dark mode.
+* **Charts** use Recharts with the Chart.js default colours; losses and breaches stay red.
 
 ```
 src/
@@ -74,6 +75,7 @@ src/
   data/            tables registry, query hooks, audit queries, actions (writes + audit), pricing
   lib/             supabase client, types (all 34 tables), domain rules, formatting, errors
   pages/           Login, access-denied / no-portal / not-found
+  styles/          plain CSS: main.css (shared) + one file per portal
   portals/
     manufacturer/  overview, batches, catalog, recalls, returns, trace, revenue
     distributor/   overview, inventory, cold chain, fulfillment, fleet, returns, facilities

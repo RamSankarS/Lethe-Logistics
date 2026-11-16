@@ -2,14 +2,23 @@ import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import type { Tone } from '@/lib/domain'
-import { TONE } from './tone'
 
-/** KPI tile: label, value, optional sub-line and icon. */
+// colour of the big number
+const NUMBER_COLOUR: Record<Tone, string> = {
+  accent: '',
+  neutral: 'num-grey',
+  info: 'num-teal',
+  good: 'num-green',
+  warn: 'num-yellow',
+  serious: 'num-orange',
+  critical: 'num-red',
+}
+
+/** KPI box: label, big number, small text under it. */
 export function Stat({
   label,
   value,
   sub,
-  icon: Icon,
   tone = 'accent',
   loading,
   onClick,
@@ -18,37 +27,19 @@ export function Stat({
   label: string
   value: ReactNode
   sub?: ReactNode
+  /** kept so old code still compiles, not shown any more */
   icon?: LucideIcon
   tone?: Tone
   loading?: boolean
   onClick?: () => void
   className?: string
 }) {
-  const t = TONE[tone]
   const Comp = onClick ? 'button' : 'div'
   return (
-    <Comp
-      onClick={onClick}
-      className={cn(
-        'group relative flex min-w-0 flex-col gap-3 rounded-2xl border border-line bg-surface p-4 text-left shadow-[0_1px_2px_rgba(16,24,40,0.04)]',
-        onClick && 'cursor-pointer transition-colors hover:border-line-strong hover:bg-surface-2',
-        className,
-      )}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-[13px] leading-5 font-medium text-ink-2">{label}</span>
-        {Icon && (
-          <span className={cn('grid size-8 shrink-0 place-items-center rounded-lg', t.soft, t.text)}>
-            <Icon className="size-4" />
-          </span>
-        )}
-      </div>
-      {loading ? (
-        <div className="h-8 w-24 animate-pulse rounded-md bg-surface-3" />
-      ) : (
-        <div className="truncate text-[28px] leading-8 font-semibold tracking-tight text-ink">{value}</div>
-      )}
-      {sub && <div className="line-clamp-2 text-[12.5px] leading-[18px] text-ink-2">{sub}</div>}
+    <Comp onClick={onClick} className={cn('stat-box', className)}>
+      <div className="stat-label">{label}</div>
+      <div className={cn('stat-number', NUMBER_COLOUR[tone])}>{loading ? '...' : value}</div>
+      {sub && <div className="stat-sub">{sub}</div>}
     </Comp>
   )
 }

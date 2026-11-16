@@ -1,0 +1,689 @@
+/* =========================================================
+   compliance portal styles
+   (the batch trace stuff and the small table cells are at
+    the bottom, those show up on the manufacturer and
+    distributor pages too so be careful changing them)
+   ========================================================= */
+
+/* ---------- space between the rows of boxes ---------- */
+
+.comp-gap-top {
+  margin-top: 20px;
+}
+
+/* a bit more here, the charts looked squashed together */
+.comp-gap-top-2 {
+  margin-top: 23px;
+}
+
+/* ---------- small text bits (used on all the compliance tabs) ---------- */
+
+.comp-small-grey {
+  font-size: 12px;
+  color: #666666;
+  margin: 0;
+}
+
+.comp-bold {
+  font-weight: bold;
+}
+
+.comp-muted {
+  color: #999999;
+}
+
+.comp-grey-text {
+  color: #555555;
+}
+
+.comp-none-text {
+  font-size: 13px;
+  color: #666666;
+  font-style: italic;
+  margin: 0;
+}
+
+/* ---------- stuff inside the table cells ---------- */
+
+.comp-cell-small {
+  font-size: 13px;
+}
+
+.comp-cell-grey {
+  font-size: 13px;
+  color: #555555;
+}
+
+/* second line under a batch number */
+.comp-sub-line {
+  font-size: 12px;
+  color: #666666;
+  margin: 2px 0 0 0;
+}
+
+.comp-bad-num {
+  font-weight: bold;
+  color: #DC3545;
+}
+
+.comp-none-small {
+  font-size: 12px;
+  color: #888888;
+}
+
+.comp-hash {
+  font-size: 11px;
+}
+
+.comp-reason-cell {
+  display: block;
+  max-width: 440px;
+  font-size: 13px;
+  color: #555555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* ---------- risk overview lists ---------- */
+
+/* card body has padding on the sides, these lists go edge to edge */
+.comp-list-body {
+  padding: 0 0 8px 0;
+}
+
+.comp-dept-list {
+  background-color: #FFFFFF;
+  border-top: 1px solid #DDDDDD;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.comp-dept-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 15px 8px 14px;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.comp-dept-row:nth-child(even) {
+  background-color: #F9F9F9;
+}
+
+.comp-dept-row:last-child {
+  border-bottom: none;
+}
+
+.comp-dept-text {
+  min-width: 0;
+}
+
+.comp-dept-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comp-dept-tags {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.comp-flag-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #CCCCCC;
+}
+
+.comp-flag-item {
+  padding: 7px 14px 9px 15px;
+  border-bottom: 1px solid #CCCCCC;
+}
+
+.comp-flag-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.comp-flag-name {
+  font-size: 13px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comp-flag-detail {
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- audit ledger ---------- */
+
+.comp-filter-box {
+  padding: 12px 14px 14px 13px;
+}
+
+.comp-ledger-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background-color: #E9E9E9;
+  border-bottom: 1px solid #CCCCCC;
+  font-size: 13px;
+  color: #444444;
+}
+
+.comp-ledger-topbar b {
+  font-size: 15px;
+  color: #000000;
+}
+
+.comp-append-note {
+  white-space: nowrap;
+}
+
+/* tailwind makes every svg display:block so the lock went on its own line */
+.comp-lock-icon {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  margin-right: 2px;
+  vertical-align: -2px;
+}
+
+.comp-ledger-table {
+  min-width: 760px;
+  background-color: #FFFFFF;
+}
+
+/* had to use !important, the .my-table td colour kept winning */
+.comp-td-grey {
+  color: #555555 !important;
+  white-space: nowrap;
+}
+
+.comp-td-action {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.comp-td-detail {
+  max-width: 320px;
+  color: #555555 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* table goes a bit see-through while the next page loads */
+.comp-fetching {
+  opacity: 0.6;
+}
+
+.comp-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px 6px 14px;
+  background-color: #EEEEEE;
+  border-top: 1px solid #CCCCCC;
+  font-size: 13px;
+  color: #444444;
+}
+
+/* tamper test box */
+.comp-tamper-text {
+  font-size: 13px;
+  color: #444444;
+  margin: 0 0 11px 0;
+}
+
+.comp-tamper-result {
+  margin-top: 12px;
+}
+
+.comp-db-message {
+  display: block;
+  margin-top: 4px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+}
+
+/* severity legend */
+.comp-legend-body {
+  font-size: 13px;
+}
+
+.comp-legend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px dotted #CCCCCC;
+}
+
+.comp-legend-row:last-child {
+  border-bottom: none;
+}
+
+.comp-legend-text {
+  text-align: right;
+  color: #555555;
+}
+
+/* the side panel when you click a ledger row */
+.comp-log-facts {
+  padding-top: 14px;
+  font-size: 14px;
+}
+
+.comp-fact-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #555555;
+  margin: 0 0 3px 0;
+}
+
+.comp-mono {
+  font-family: "Courier New", Courier, monospace;
+}
+
+.comp-log-id {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.comp-json-box {
+  max-height: 420px;
+  overflow: auto;
+  margin: 0;
+  padding: 10px 12px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  color: #000000;
+}
+
+/* ---------- cold chain ---------- */
+
+.comp-quar-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 7px 10px;
+  margin-bottom: 7px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 3px;
+}
+
+/* =========================================================
+   batch trace (search box, list of batches, pedigree)
+   ========================================================= */
+
+.trace-search-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+}
+
+.trace-search-input {
+  height: 34px;
+  font-size: 15px;
+}
+
+.trace-search-list {
+  position: absolute;
+  z-index: 20;
+  width: 100%;
+  margin-top: 2px;
+  background-color: #FFFFFF;
+  border: 1px solid #999999;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.trace-search-option {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 9px;
+  text-align: left;
+  background-color: #FFFFFF;
+  border: none;
+  border-bottom: 1px solid #EEEEEE;
+  cursor: pointer;
+}
+
+.trace-search-option:hover {
+  background-color: #FFFFCC;
+}
+
+/* 2px in from the right, it looked wider than the search box */
+.trace-pick-box {
+  margin-top: 14px;
+  margin-right: 2px;
+  overflow: hidden;
+}
+
+.trace-pick-title {
+  margin: 0;
+  padding: 8px 10px 7px 10px;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: #E2E2E2;
+  border-bottom: 1px solid #CCCCCC;
+}
+
+.trace-none-text {
+  font-size: 13px;
+  color: #666666;
+  margin: 0;
+}
+
+.trace-pick-box .trace-none-text {
+  padding: 8px 10px;
+}
+
+.trace-pick-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px 8px 11px;
+  text-align: left;
+  background-color: #FFFFFF;
+  border: none;
+  border-bottom: 1px solid #DDDDDD;
+  cursor: pointer;
+}
+
+.trace-pick-row:last-child {
+  border-bottom: none;
+}
+
+.trace-pick-row-off:hover {
+  background-color: #FFFFCC;
+}
+
+/* the one that is picked (blue line on the left like the menu) */
+.trace-pick-row-on {
+  background-color: #DDEEFF;
+  border-left: 4px solid #0066CC;
+  padding-left: 7px;
+}
+
+.trace-pick-text {
+  min-width: 0;
+}
+
+.trace-batch-no {
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trace-pick-sub {
+  display: block;
+  font-size: 12px;
+  color: #666666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* pedigree top box */
+.trace-head-body {
+  padding-top: 14px;
+}
+
+.trace-batch-code {
+  font-size: 15px;
+  font-weight: bold;
+  padding: 1px 5px;
+}
+
+.trace-med-name {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  color: #000000;
+  margin: 8px 0 2px 0;
+}
+
+.trace-med-sub {
+  font-size: 13px;
+  color: #555555;
+  margin: 0;
+}
+
+.trace-kv-grid {
+  margin-top: 16px;
+  padding-top: 13px;
+  border-top: 1px dashed #BBBBBB;
+}
+
+.trace-custody-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 7px 9px 7px 11px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+}
+
+.trace-custody-loc {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- small cells (medicine, org, expiry, storage, label/value) ---------- */
+
+.trace-dash {
+  color: #999999;
+}
+
+.trace-cell {
+  min-width: 0;
+}
+
+.trace-cell-main {
+  font-weight: bold;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trace-cell-sub {
+  font-size: 12px;
+  color: #666666;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trace-date-text {
+  font-size: 13px;
+  color: #555555;
+}
+
+/* no colour on purpose, it sits inside the blue message boxes too */
+.trace-storage {
+  font-size: 13px;
+}
+
+/* same svg display:block problem as the lock icon */
+.trace-cold-icon {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  margin-right: 3px;
+  vertical-align: -2px;
+  color: #17A2B8;
+}
+
+.trace-kv {
+  min-width: 0;
+}
+
+.trace-kv-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #666666;
+  margin: 0;
+}
+
+.trace-kv-value {
+  margin-top: 2px;
+  font-size: 14px;
+  color: #000000;
+}
+
+/* =========================================================
+   night mode
+   ========================================================= */
+
+[data-theme="dark"] .comp-small-grey,
+[data-theme="dark"] .comp-sub-line,
+[data-theme="dark"] .comp-none-text,
+[data-theme="dark"] .comp-grey-text,
+[data-theme="dark"] .comp-cell-grey,
+[data-theme="dark"] .comp-reason-cell,
+[data-theme="dark"] .comp-tamper-text,
+[data-theme="dark"] .comp-legend-text,
+[data-theme="dark"] .comp-fact-label,
+[data-theme="dark"] .trace-none-text,
+[data-theme="dark"] .trace-pick-sub,
+[data-theme="dark"] .trace-med-sub,
+[data-theme="dark"] .trace-cell-sub,
+[data-theme="dark"] .trace-date-text,
+[data-theme="dark"] .trace-kv-label {
+  color: #B5B5B5;
+}
+
+[data-theme="dark"] .comp-td-grey,
+[data-theme="dark"] .comp-td-detail {
+  color: #B5B5B5 !important;
+}
+
+[data-theme="dark"] .comp-muted,
+[data-theme="dark"] .comp-none-small,
+[data-theme="dark"] .trace-dash {
+  color: #AAAAAA;
+}
+
+[data-theme="dark"] .comp-dept-name,
+[data-theme="dark"] .comp-ledger-topbar b,
+[data-theme="dark"] .trace-med-name,
+[data-theme="dark"] .trace-batch-no {
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .trace-kv-value {
+  color: #E6E6E6;
+}
+
+[data-theme="dark"] .comp-bad-num {
+  color: #FF6B6B;
+}
+
+[data-theme="dark"] .trace-cold-icon {
+  color: #5BC0DE;
+}
+
+[data-theme="dark"] .comp-dept-list,
+[data-theme="dark"] .comp-ledger-table,
+[data-theme="dark"] .comp-quar-item,
+[data-theme="dark"] .trace-custody-item {
+  background-color: #333333 !important;
+  border-color: #555555 !important;
+}
+
+[data-theme="dark"] .comp-dept-row {
+  border-color: #4A4A4A;
+}
+
+[data-theme="dark"] .comp-dept-row:nth-child(even) {
+  background-color: #383838;
+}
+
+[data-theme="dark"] .comp-flag-list,
+[data-theme="dark"] .comp-flag-item,
+[data-theme="dark"] .comp-legend-row,
+[data-theme="dark"] .trace-kv-grid {
+  border-color: #555555;
+}
+
+[data-theme="dark"] .comp-ledger-topbar,
+[data-theme="dark"] .comp-pager,
+[data-theme="dark"] .trace-pick-title {
+  background-color: #3D3D3D;
+  border-color: #555555;
+  color: #E6E6E6;
+}
+
+[data-theme="dark"] .comp-json-box {
+  background-color: #1E1E1E;
+  border-color: #555555;
+  color: #E6E6E6;
+}
+
+[data-theme="dark"] .trace-search-list {
+  background-color: #333333;
+  border-color: #777777;
+}
+
+[data-theme="dark"] .trace-pick-row,
+[data-theme="dark"] .trace-search-option {
+  background-color: #333333;
+  border-color: #555555;
+  color: #E6E6E6;
+}
+
+[data-theme="dark"] .trace-pick-row-off:hover,
+[data-theme="dark"] .trace-search-option:hover {
+  background-color: #4A4A2A;
+}
+
+[data-theme="dark"] .trace-pick-row-on {
+  background-color: #1F3A57;
+  border-left-color: #3399FF;
+}

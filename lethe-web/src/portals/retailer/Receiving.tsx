@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AlertTriangle, CheckCircle2, Clock, PackageCheck, PenLine, Truck, Undo2 } from 'lucide-react'
+import { Clock, PackageCheck, PenLine, Truck, Undo2 } from 'lucide-react'
 import { useProfile } from '@/auth/AuthProvider'
 import { logEvent, useRunner } from '@/data/actions'
 import { useLookups } from '@/data/hooks'
@@ -91,8 +91,8 @@ function ConfirmReceipt({ order, onClose, onDamaged }: { order: OrderView | null
         </>
       }
     >
-      <div className="space-y-4">
-        <div className="rounded-xl border border-line">
+      <div className="retailer-sign-form">
+        <div className="retailer-sign-lines">
           {order.items.map((i, idx) => (
             <LineRow key={i.order_item_id} batchId={i.batch_id} qty={i.quantity} last={idx === order.items.length - 1} />
           ))}
@@ -103,13 +103,10 @@ function ConfirmReceipt({ order, onClose, onDamaged }: { order: OrderView | null
               key={c.id}
               type="button"
               onClick={() => setCondition(c.id)}
-              className={`rounded-xl border p-3 text-left transition-colors ${condition === c.id ? (c.id === 'Good' ? 'border-good bg-good-soft' : 'border-serious bg-serious-soft') : 'border-line hover:bg-surface-2'}`}
+              className={`retailer-cond-btn ${condition === c.id ? (c.id === 'Good' ? 'retailer-cond-good' : 'retailer-cond-bad') : 'retailer-cond-off'}`}
             >
-              <p className="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink">
-                {c.id === 'Good' ? <CheckCircle2 className="size-4 text-good-text" /> : <AlertTriangle className="size-4 text-serious-text" />}
-                {c.label}
-              </p>
-              <p className="mt-0.5 text-xs text-ink-2">{c.hint}</p>
+              <p className="retailer-cond-name">{c.label}</p>
+              <p className="retailer-cond-hint">{c.hint}</p>
             </button>
           ))}
         </div>
@@ -117,7 +114,7 @@ function ConfirmReceipt({ order, onClose, onDamaged }: { order: OrderView | null
           <Textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder={needsRemarks ? 'Water damage on 15 boxes in carton 2' : 'All cartons sealed, temperature log OK'} />
         </Field>
         <Field label="Digital signature" required hint="Type your full name. Lethe stores a SHA-256 fingerprint of it as proof of delivery.">
-          <Input value={signature} onChange={(e) => setSignature(e.target.value)} placeholder={fullName(profile)} className="font-medium" />
+          <Input value={signature} onChange={(e) => setSignature(e.target.value)} placeholder={fullName(profile)} className="retailer-sig-input" />
         </Field>
         {condition === 'Good' || condition === 'Partial' ? (
           <Callout tone="info">Signing triggers two database actions: the order flips to Delivered and an invoice (base + 5% GST) is written to the payment ledger.</Callout>
@@ -132,11 +129,11 @@ function ConfirmReceipt({ order, onClose, onDamaged }: { order: OrderView | null
 function LineRow({ batchId, qty, last }: { batchId: number; qty: number; last: boolean }) {
   const L = useLookups()
   return (
-    <div className={`flex items-center justify-between gap-2 px-3.5 py-2.5 text-[13px] ${last ? '' : 'border-b border-line'}`}>
+    <div className={`retailer-sign-line ${last ? '' : 'retailer-sign-line-border'}`}>
       <span>
-        <b className="font-medium text-ink">{L.medName(batchId)}</b> <Code>{L.batchNo(batchId)}</Code>
+        <b>{L.medName(batchId)}</b> <Code>{L.batchNo(batchId)}</Code>
       </span>
-      <span className="text-ink tabular">{num(qty)} units</span>
+      <span className="retailer-line-qty">{num(qty)} units</span>
     </div>
   )
 }
@@ -151,12 +148,12 @@ export function Receiving() {
   const history = m.orders.filter((x) => x.receipt)
 
   const cols: Column<OrderView>[] = [
-    { key: 'order', header: 'Order', sort: (x) => x.o.order_id, cell: (x) => <span className="font-semibold tabular">#{x.o.order_id}</span> },
-    { key: 'when', header: 'Received', sort: (x) => x.receipt!.delivery_time, cell: (x) => <span className="text-[13px] text-ink-2 tabular">{dateTime(x.receipt!.delivery_time)}</span> },
+    { key: 'order', header: 'Order', sort: (x) => x.o.order_id, cell: (x) => <span className="retailer-id-cell">#{x.o.order_id}</span> },
+    { key: 'when', header: 'Received', sort: (x) => x.receipt!.delivery_time, cell: (x) => <span className="retailer-cell-grey">{dateTime(x.receipt!.delivery_time)}</span> },
     { key: 'cond', header: 'Condition', sort: (x) => x.receipt!.received_condition, cell: (x) => <Badge tone={x.receipt!.received_condition === 'Good' ? 'good' : 'serious'} dot>{x.receipt!.received_condition}</Badge> },
-    { key: 'by', header: 'Signed by', cell: (x) => <span className="text-[13px]">{L.userName(x.receipt!.received_by_user_id)}</span>, hideBelow: 'md' },
-    { key: 'remarks', header: 'Remarks', cell: (x) => <span className="block max-w-[280px] truncate text-[13px] text-ink-2" title={x.receipt!.remarks ?? ''}>{x.receipt!.remarks ?? '—'}</span>, hideBelow: 'lg' },
-    { key: 'sig', header: 'Signature', cell: (x) => <Code className="text-[11px]">{x.receipt!.digital_signature.slice(0, 22)}…</Code>, hideBelow: 'xl' },
+    { key: 'by', header: 'Signed by', cell: (x) => <span className="retailer-cell-text">{L.userName(x.receipt!.received_by_user_id)}</span>, hideBelow: 'md' },
+    { key: 'remarks', header: 'Remarks', cell: (x) => <span className="retailer-remarks-cell" title={x.receipt!.remarks ?? ''}>{x.receipt!.remarks ?? '—'}</span>, hideBelow: 'lg' },
+    { key: 'sig', header: 'Signature', cell: (x) => <Code className="retailer-sig-code">{x.receipt!.digital_signature.slice(0, 22)}…</Code>, hideBelow: 'xl' },
     {
       key: 'act',
       header: '',
@@ -184,11 +181,11 @@ export function Receiving() {
               {incoming.map((x) => {
                 const late = x.manifest?.estimated_arrival_time && new Date(x.manifest.estimated_arrival_time) < new Date()
                 return (
-                  <div key={x.o.order_id} className="rounded-2xl border border-line p-4">
+                  <div key={x.o.order_id} className="retailer-ship-box">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
-                        <p className="text-[15px] font-semibold text-ink">Order #{x.o.order_id}</p>
-                        <p className="text-[12.5px] text-ink-2">
+                        <p className="retailer-ship-title">Order #{x.o.order_id}</p>
+                        <p className="retailer-ship-sub">
                           {x.items.length} lines · {money(x.value)}
                         </p>
                       </div>
@@ -198,16 +195,16 @@ export function Receiving() {
                       </div>
                     </div>
                     {x.manifest ? (
-                      <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl bg-surface-2 p-3 text-[12.5px]">
-                        <div><p className="text-muted">Vehicle</p><p className="text-ink">{L.vehicle.get(x.manifest.vehicle_id)?.vehicle_no} · {L.vehicle.get(x.manifest.vehicle_id)?.vehicle_type}</p></div>
-                        <div><p className="text-muted">Driver</p><p className="text-ink">{L.userName(x.manifest.driver_user_id)}</p></div>
-                        <div><p className="text-muted">Dispatched</p><p className="text-ink">{relative(x.manifest.dispatch_time_utc)}</p></div>
-                        <div><p className="text-muted">ETA</p><p className="text-ink">{x.manifest.estimated_arrival_time ? dateTime(x.manifest.estimated_arrival_time) : 'Not set'}</p></div>
+                      <div className="retailer-ship-details grid grid-cols-2 gap-2">
+                        <div><p className="retailer-small-label">Vehicle</p><p className="retailer-detail-value">{L.vehicle.get(x.manifest.vehicle_id)?.vehicle_no} · {L.vehicle.get(x.manifest.vehicle_id)?.vehicle_type}</p></div>
+                        <div><p className="retailer-small-label">Driver</p><p className="retailer-detail-value">{L.userName(x.manifest.driver_user_id)}</p></div>
+                        <div><p className="retailer-small-label">Dispatched</p><p className="retailer-detail-value">{relative(x.manifest.dispatch_time_utc)}</p></div>
+                        <div><p className="retailer-small-label">ETA</p><p className="retailer-detail-value">{x.manifest.estimated_arrival_time ? dateTime(x.manifest.estimated_arrival_time) : 'Not set'}</p></div>
                       </div>
                     ) : (
-                      <p className="mt-3 text-[12.5px] text-ink-2">No manifest attached yet.</p>
+                      <p className="retailer-ship-nomanifest">No manifest attached yet.</p>
                     )}
-                    <div className="mt-3 flex justify-end">
+                    <div className="retailer-ship-btn-row">
                       <Button variant="primary" icon={PenLine} onClick={() => setSigning(x)}>
                         Sign for delivery
                       </Button>
@@ -220,7 +217,7 @@ export function Receiving() {
         </CardBody>
       </Card>
 
-      <Card className="mt-5">
+      <Card className="retailer-history-box">
         <CardHeader title="Proof-of-delivery history" subtitle="Every delivery you have signed for" icon={PackageCheck} />
         <DataTable bare rows={history} columns={cols} rowKey={(x) => x.o.order_id} loading={m.isLoading} initialSort={{ key: 'when', dir: 'desc' }} emptyTitle="No deliveries yet" />
       </Card>

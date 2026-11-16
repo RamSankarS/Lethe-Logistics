@@ -70,10 +70,10 @@ export function BatchActions({ batch, size = 'sm' }: { batch: Batch; size?: 'xs'
       { success: `${batch.batch_number} → ${status}` },
     )
 
-  if (!transitions.length) return <span className="text-xs text-muted">Locked</span>
+  if (!transitions.length) return <span className="mfr-locked-text">Locked</span>
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+    <div className="mfr-qc-buttons" onClick={(e) => e.stopPropagation()}>
       {transitions.map((s) => {
         const a = s === 'Quality-Check' && batch.status === 'Released' ? { ...ACTION[s], label: 'Hold for QC' } : ACTION[s]
         return (
@@ -83,7 +83,7 @@ export function BatchActions({ batch, size = 'sm' }: { batch: Batch; size?: 'xs'
             variant={a.variant === 'success' ? 'success' : a.variant === 'danger' ? 'ghost' : 'secondary'}
             icon={a.icon}
             loading={busy === `status-${batch.batch_id}`}
-            className={a.variant === 'danger' ? 'text-critical-text hover:bg-critical-soft hover:text-critical-text' : undefined}
+            className={a.variant === 'danger' ? 'mfr-reject-btn' : undefined}
             onClick={() => (s === 'Released' ? (setChecks({}), setReleasing(true)) : s === 'Rejected' ? setRejecting(true) : void setStatus(s))}
           >
             {a.label}
@@ -117,11 +117,11 @@ export function BatchActions({ batch, size = 'sm' }: { batch: Batch; size?: 'xs'
           </>
         }
       >
-        <div className="space-y-3">
+        <div className="mfr-checklist">
           {checklist.map((c) => (
             <Checkbox key={c.id} label={c.label} checked={!!checks[c.id]} onChange={(v) => setChecks((p) => ({ ...p, [c.id]: v }))} />
           ))}
-          <Callout tone="info" className="mt-2">
+          <Callout tone="info" className="mfr-checklist-note">
             Released batches become orderable by retailers. The database rejects releasing a batch that skipped the quality check.
           </Callout>
         </div>
@@ -140,7 +140,7 @@ export function BatchActions({ batch, size = 'sm' }: { batch: Batch; size?: 'xs'
           if (r.ok) setRejecting(false)
         }}
       >
-        A rejected batch can <b className="text-ink">never</b> re-enter the supply chain. The governance trigger blocks any attempt to revive it, and the decision is written to the immutable audit ledger.
+        A rejected batch can <b className="mfr-strong">never</b> re-enter the supply chain. The governance trigger blocks any attempt to revive it, and the decision is written to the immutable audit ledger.
       </ConfirmDialog>
     </div>
   )

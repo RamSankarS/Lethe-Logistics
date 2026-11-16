@@ -59,17 +59,14 @@ function ChartTip({
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="min-w-[150px] rounded-xl border border-line bg-surface px-3 py-2 shadow-lg">
-      {label != null && <p className="mb-1.5 text-[11.5px] font-medium text-ink-2">{labelFormat ? labelFormat(label) : label}</p>}
-      <div className="flex flex-col gap-1">
-        {payload.map((p, i) => (
-          <div key={`${p.dataKey}-${i}`} className="flex items-center gap-2 text-[12.5px]">
-            <span className="h-0.5 w-3 rounded-full" style={{ background: p.color }} />
-            <span className="tabular font-semibold text-ink">{typeof p.value === 'number' ? format(p.value) : p.value}</span>
-            <span className="truncate text-ink-2">{p.name}</span>
-          </div>
-        ))}
-      </div>
+    <div className="chart-tip">
+      {label != null && <b>{labelFormat ? labelFormat(label) : label}</b>}
+      {payload.map((p, i) => (
+        <div key={`${p.dataKey}-${i}`}>
+          <span className="color-square" style={{ background: p.color }} />
+          {p.name}: {typeof p.value === 'number' ? format(p.value) : p.value}
+        </div>
+      ))}
     </div>
   )
 }
@@ -77,10 +74,10 @@ function ChartTip({
 export function Legend({ series, className }: { series: SeriesDef[]; className?: string }) {
   if (series.length < 2) return null
   return (
-    <div className={cn('flex flex-wrap gap-x-4 gap-y-1', className)}>
+    <div className={cn('chart-legend', className)}>
       {series.map((s) => (
-        <span key={s.key} className="inline-flex items-center gap-1.5 text-[12px] text-ink-2">
-          <span className="size-2.5 rounded-sm" style={{ background: s.color }} />
+        <span key={s.key}>
+          <span className="color-square" style={{ background: s.color }} />
           {s.label}
         </span>
       ))}
@@ -126,17 +123,14 @@ export function ColumnChart<T extends object>({
         <XAxis dataKey={x as string} tick={axisTick} tickLine={false} axisLine={{ stroke: 'var(--axis)' }} interval={0} tickFormatter={xFormat} minTickGap={4} />
         <YAxis tick={axisTick} tickLine={false} axisLine={false} tickFormatter={(v: number) => compact(v)} width={48} allowDecimals={false} />
         <Tooltip cursor={{ fill: 'var(--surface-3)', opacity: 0.6 }} content={<ChartTip format={format} />} />
-        {series.map((s, i) => (
+        {series.map((s) => (
           <Bar
             key={s.key}
             dataKey={s.key}
             name={s.label}
             fill={s.color}
-            maxBarSize={24}
+            maxBarSize={30}
             stackId={stacked ? 'stack' : undefined}
-            stroke={stacked ? 'var(--surface)' : undefined}
-            strokeWidth={stacked ? 2 : 0}
-            radius={stacked ? (i === series.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]) : [4, 4, 0, 0]}
           />
         ))}
       </BarChart>
@@ -172,7 +166,7 @@ export function BarList<T extends object>({
         <XAxis type="number" hide />
         <YAxis type="category" dataKey={y as string} tick={{ ...axisTick, fill: 'var(--ink-2)' }} tickLine={false} axisLine={false} width={120} />
         <Tooltip cursor={{ fill: 'var(--surface-3)', opacity: 0.6 }} content={<ChartTip format={format} />} />
-        <Bar dataKey={value as string} name={label} fill={color} maxBarSize={20} radius={[0, 4, 4, 0]}>
+        <Bar dataKey={value as string} name={label} fill={color} maxBarSize={22}>
           {colorOf && data.map((row, i) => <Cell key={i} fill={colorOf(row)} />)}
           <LabelList dataKey={value as string} position="right" formatter={(v: unknown) => format(Number(v))} style={{ fill: 'var(--ink-2)', fontSize: 11.5, fontWeight: 600 }} />
         </Bar>
@@ -213,7 +207,7 @@ export function TrendChart<T extends object>({
         <LineChart data={data as Row[]} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
           {common}
           {series.map((s) => (
-            <Line key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={s.color} strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: 'var(--surface)' }} />
+            <Line key={s.key} type="linear" dataKey={s.key} name={s.label} stroke={s.color} strokeWidth={2} dot={{ r: 3, fill: s.color }} />
           ))}
         </LineChart>
       ) : (
@@ -222,15 +216,14 @@ export function TrendChart<T extends object>({
           {series.map((s) => (
             <Area
               key={s.key}
-              type="monotone"
+              type="linear"
               dataKey={s.key}
               name={s.label}
               stroke={s.color}
               strokeWidth={2}
               fill={s.color}
-              fillOpacity={0.1}
-              dot={false}
-              activeDot={{ r: 4, strokeWidth: 2, stroke: 'var(--surface)' }}
+              fillOpacity={0.3}
+              dot={{ r: 3, fill: s.color }}
             />
           ))}
         </AreaChart>
@@ -284,16 +277,15 @@ export function Sparkline({ values, color = 'var(--series-1)', height = 28, widt
   )
 }
 
-/** Sequential blue ramp. Light mode runs light -> dark; dark mode is its own selection, dark -> light. */
-const RAMP_LIGHT = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#1c5cab', '#104281', '#0d366b']
-const RAMP_DARK = ['#0d366b', '#104281', '#184f95', '#1c5cab', '#256abf', '#3987e5', '#6da7ec', '#9ec5f4']
+/** Heat colours, yellow (few) to red (lots). Same in light and dark mode. */
+const RAMP_LIGHT = ['#FFFFCC', '#FFEDA0', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#B10026']
+const RAMP_DARK = RAMP_LIGHT
 
 export function heatColor(value: number, max: number, dark = false): { bg: string; fg: string } {
   if (value <= 0 || max <= 0) return { bg: 'var(--surface-3)', fg: 'var(--muted)' }
   const ramp = dark ? RAMP_DARK : RAMP_LIGHT
   const i = Math.min(ramp.length - 1, Math.floor((value / max) * (ramp.length - 1) + 0.0001))
-  const darkText = dark ? i >= 6 : i < 3
-  return { bg: ramp[i], fg: darkText ? '#0b0b0b' : '#ffffff' }
+  return { bg: ramp[i], fg: i < 4 ? '#000000' : '#FFFFFF' }
 }
 
 /** Matrix heatmap: rows x columns with value-coded cells and hover titles. */
@@ -320,7 +312,7 @@ export function Heatmap({
   const max = Math.max(0, ...rows.flatMap((r) => cols.map((c) => value(r, c))))
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-separate border-spacing-[3px] text-[12px]">
+      <table className="w-full border-separate border-spacing-[2px] text-[12px]">
         <thead>
           <tr>
             <th />
@@ -344,7 +336,7 @@ export function Heatmap({
                   <td
                     key={c}
                     title={cellTitle ? cellTitle(r, c, v) : `${rowLabel(r)} · ${colLabel(c)}: ${format(v)}`}
-                    className="h-9 min-w-[44px] rounded-md text-center font-semibold tabular"
+                    className="h-9 min-w-[44px] text-center font-bold"
                     style={{ background: bg, color: fg }}
                   >
                     {v > 0 ? format(v) : ''}
@@ -357,9 +349,9 @@ export function Heatmap({
       </table>
       <div className="mt-3 flex items-center gap-2 text-[11.5px] text-muted">
         <span>Fewer</span>
-        <div className="flex gap-[2px]">
+        <div className="flex">
           {ramp.map((c) => (
-            <span key={c} className="h-2.5 w-5 rounded-sm" style={{ background: c }} />
+            <span key={c} className="h-3 w-5 border border-[#999999]" style={{ background: c }} />
           ))}
         </div>
         <span>More</span>

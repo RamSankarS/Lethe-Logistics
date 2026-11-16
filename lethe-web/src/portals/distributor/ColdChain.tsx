@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { CheckCircle2, Droplets, Flame, Radio, ShieldAlert, Snowflake, Sun, Thermometer, TriangleAlert } from 'lucide-react'
+import { CheckCircle2, Flame, Radio, ShieldAlert, Snowflake, Sun, Thermometer, TriangleAlert } from 'lucide-react'
 import { useProfile } from '@/auth/AuthProvider'
 import { logEvent, mustChange, useRunner } from '@/data/actions'
 import { useLookups, useTables } from '@/data/hooks'
@@ -83,7 +83,7 @@ function LogReading({ open, onClose, preset }: { open: boolean; onClose: () => v
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="dist-modal-stack">
         <Field label="Storage location" required>
           <Select value={locId} onChange={(e) => setLocId(e.target.value)}>
             <option value="">Choose a location…</option>
@@ -114,13 +114,13 @@ function LogReading({ open, onClose, preset }: { open: boolean; onClose: () => v
             The database trigger will quarantine{' '}
             {v!.items.length ? (
               <>
-                <b className="text-ink">{v!.items.length} batch(es)</b> on this shelf ({v!.items.map((i) => L.batchNo(i.batch_id)).join(', ')}) and flag them for Quality-Check network-wide.
+                <b className="dist-breach-count">{v!.items.length} batch(es)</b> on this shelf ({v!.items.map((i) => L.batchNo(i.batch_id)).join(', ')}) and flag them for Quality-Check network-wide.
               </>
             ) : (
               'nothing: this shelf is empty.'
             )}
             {locked.length > 0 && (
-              <p className="mt-2 font-medium text-critical-text">
+              <p className="dist-locked-note">
                 {locked.map((i) => L.batchNo(i.batch_id)).join(', ')} is Recalled/Rejected. Recalled batches can never be re-flagged for QC, so the database may reject this reading. Move that stock first.
               </p>
             )}
@@ -135,30 +135,30 @@ function ZoneCard({ v, onLog, selected, onSelect }: { v: LocationView; onLog: ()
   const cold = v.loc.zone_type === 'Cold Storage'
   const breach = v.state === 'high' || v.state === 'low'
   return (
-    <Card className={cn('cursor-pointer p-4 transition-colors', selected ? 'border-accent ring-[3px] ring-accent/15' : 'hover:border-line-strong')} onClick={onSelect}>
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink">
-            {cold ? <Snowflake className="size-4 text-info-text" /> : <Sun className="size-4 text-warn-text" />}
+    <Card className={cn('dist-zone-box', selected && 'dist-zone-selected')} onClick={onSelect}>
+      <div className="dist-zone-top">
+        <div className="dist-zone-info">
+          <p className="dist-zone-name">
+            {cold ? <Snowflake className="dist-zone-icon dist-icon-cold" /> : <Sun className="dist-zone-icon dist-icon-warm" />}
             {v.wh?.warehouse_name}
           </p>
-          <p className="text-xs text-ink-2">
+          <p className="dist-zone-sub">
             L{v.loc.location_id} · {v.loc.zone_type} · target {v.loc.target_min_temp}–{v.loc.target_max_temp}°C
           </p>
         </div>
         {v.state === 'none' ? <Badge>No data</Badge> : breach ? <Badge tone="critical" icon={TriangleAlert}>{v.state === 'high' ? 'Too warm' : 'Too cold'}</Badge> : <Badge tone="good" icon={CheckCircle2}>In range</Badge>}
       </div>
-      <div className="mt-3 flex items-end justify-between gap-2">
+      <div className="dist-zone-mid">
         <div>
-          <p className={cn('text-[30px] leading-9 font-semibold tracking-tight tabular', breach ? 'text-critical-text' : 'text-ink')}>{v.reading ? temp(v.reading.temperature_celsius) : '—'}</p>
-          <p className="flex items-center gap-1 text-xs text-ink-2">
-            <Droplets className="size-3.5" /> {v.reading ? `${num(v.reading.humidity_percentage)}% RH` : 'no humidity data'} · {v.reading ? relative(v.reading.recorded_at) : 'never'}
+          <p className={cn('dist-big-temp', breach && 'dist-temp-red')}>{v.reading ? temp(v.reading.temperature_celsius) : '—'}</p>
+          <p className="dist-zone-hum">
+            {v.reading ? `${num(v.reading.humidity_percentage)}% RH` : 'no humidity data'} · {v.reading ? relative(v.reading.recorded_at) : 'never'}
           </p>
         </div>
         <Sparkline values={v.readings.map((r) => r.temperature_celsius)} color={breach ? 'var(--critical)' : 'var(--series-1)'} />
       </div>
-      <div className="mt-3 flex items-center justify-between border-t border-line pt-2.5">
-        <span className="text-xs text-ink-2">
+      <div className="dist-zone-foot">
+        <span className="dist-tiny-grey">
           {plural(v.items.length, 'batch', 'batches')} · {num(v.stock)} units
         </span>
         <Button
@@ -202,29 +202,29 @@ export function ColdChain() {
     )
 
   const qCols: Column<QuarantineLog>[] = [
-    { key: 'id', header: '#', sort: (q) => q.quarantine_id, cell: (q) => <span className="tabular text-ink-2">{q.quarantine_id}</span> },
-    { key: 'batch', header: 'Batch', sort: (q) => L.batchNo(q.batch_id), cell: (q) => <div><Code>{L.batchNo(q.batch_id)}</Code><p className="mt-0.5 text-xs text-ink-2">{L.medName(q.batch_id)}</p></div> },
-    { key: 'loc', header: 'Location', cell: (q) => <span className="text-[13px] text-ink-2">{L.locLabel(q.location_id)}</span>, hideBelow: 'md' },
+    { key: 'id', header: '#', sort: (q) => q.quarantine_id, cell: (q) => <span className="dist-grey">{q.quarantine_id}</span> },
+    { key: 'batch', header: 'Batch', sort: (q) => L.batchNo(q.batch_id), cell: (q) => <div><Code>{L.batchNo(q.batch_id)}</Code><p className="dist-med-name">{L.medName(q.batch_id)}</p></div> },
+    { key: 'loc', header: 'Location', cell: (q) => <span className="dist-cell-grey">{L.locLabel(q.location_id)}</span>, hideBelow: 'md' },
     {
       key: 'reading',
       header: 'Trigger',
       cell: (q) => {
         const s = q.breaching_log_id != null ? sensorById.get(q.breaching_log_id) : undefined
-        return s ? <span className="text-[13px]"><b className="font-semibold text-critical-text">{temp(s.temperature_celsius)}</b> <span className="text-ink-2">· {dateTime(s.recorded_at)}</span></span> : <span className="text-ink-2">{q.quarantine_reason}</span>
+        return s ? <span className="dist-cell-text"><b className="dist-red-text">{temp(s.temperature_celsius)}</b> <span className="dist-grey">· {dateTime(s.recorded_at)}</span></span> : <span className="dist-grey">{q.quarantine_reason}</span>
       },
     },
-    { key: 'by', header: 'Responsible', cell: (q) => <span className="text-[13px] text-ink-2">{L.userName(q.action_taken_by)}</span>, hideBelow: 'lg' },
+    { key: 'by', header: 'Responsible', cell: (q) => <span className="dist-cell-grey">{L.userName(q.action_taken_by)}</span>, hideBelow: 'lg' },
     { key: 'status', header: 'Status', sort: (q) => q.status, cell: (q) => <StatusBadge value={q.status} meta={QUARANTINE_STATUS} /> },
     {
       key: 'act',
       header: '',
       cell: (q) =>
         q.status === 'Active' ? (
-          <div className="flex justify-end gap-1">
+          <div className="dist-action-btns dist-btns-right">
             <Button size="xs" variant="ghost" icon={CheckCircle2} loading={busy === `q-${q.quarantine_id}`} onClick={() => void setQ(q, 'Cleared')}>
               Clear
             </Button>
-            <Button size="xs" variant="ghost" icon={Flame} className="text-critical-text hover:bg-critical-soft" onClick={() => void setQ(q, 'Destroyed')}>
+            <Button size="xs" variant="ghost" icon={Flame} className="dist-red-link" onClick={() => void setQ(q, 'Destroyed')}>
               Destroyed
             </Button>
           </div>
@@ -245,7 +245,7 @@ export function ColdChain() {
         <Stat label="Active quarantines" value={num(m.activeQuarantine.length)} sub="stock held pending QC" icon={ShieldAlert} tone="serious" />
       </StatGrid>
 
-      <div className="mt-5 mb-3">
+      <div className="dist-filter-bar">
         <Segmented
           value={zone}
           onChange={setZone}
@@ -268,7 +268,7 @@ export function ColdChain() {
       </div>
 
       {sel && (
-        <Card className="mt-5">
+        <Card className="dist-card-gap">
           <CardHeader
             title={`Temperature trace · ${L.locLabel(sel.loc.location_id)}`}
             subtitle={`Green band = target ${sel.loc.target_min_temp}–${sel.loc.target_max_temp}°C. Red line marks the upper limit, blue the lower.`}
@@ -283,7 +283,7 @@ export function ColdChain() {
         </Card>
       )}
 
-      <Card className="mt-5">
+      <Card className="dist-card-gap-2">
         <CardHeader title="Quarantine register" subtitle="Rows written by tr_monitor_temperature_breach when a reading leaves the target band" icon={ShieldAlert} />
         <DataTable bare rows={t.data.quarantine} columns={qCols} rowKey={(q) => q.quarantine_id} initialSort={{ key: 'id', dir: 'desc' }} />
       </Card>

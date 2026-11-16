@@ -4,7 +4,7 @@ import { cn } from '@/lib/cn'
 
 export function Card({ className, children, ...rest }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('rounded-2xl border border-line bg-surface shadow-[0_1px_2px_rgba(16,24,40,0.04)]', className)} {...rest}>
+    <div className={cn('box-1', className)} {...rest}>
       {children}
     </div>
   )
@@ -13,45 +13,38 @@ export function Card({ className, children, ...rest }: HTMLAttributes<HTMLDivEle
 export function CardHeader({
   title,
   subtitle,
-  icon: Icon,
   actions,
   className,
 }: {
   title: ReactNode
   subtitle?: ReactNode
+  /** kept so old code still compiles, not shown any more */
   icon?: LucideIcon
   actions?: ReactNode
   className?: string
 }) {
   return (
-    <div className={cn('flex flex-wrap items-start justify-between gap-3 px-5 pt-4 pb-3', className)}>
-      <div className="flex min-w-0 items-start gap-3">
-        {Icon && (
-          <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent-text">
-            <Icon className="size-4" />
-          </span>
-        )}
-        <div className="min-w-0">
-          <h3 className="text-[15px] leading-6 font-semibold text-ink">{title}</h3>
-          {subtitle && <p className="mt-0.5 text-[13px] leading-5 text-ink-2">{subtitle}</p>}
-        </div>
+    <div className={cn('box-header', className)}>
+      <div style={{ minWidth: 0 }}>
+        <h3 className="box-title">{title}</h3>
+        {subtitle && <p className="box-subtitle">{subtitle}</p>}
       </div>
-      {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+      {actions && <div className="box-actions">{actions}</div>}
     </div>
   )
 }
 
 export function CardBody({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={cn('px-5 pb-5', className)}>{children}</div>
+  return <div className={cn('box-body', className)}>{children}</div>
 }
 
 /** Section title used between groups of cards. */
 export function SectionTitle({ children, hint, actions }: { children: ReactNode; hint?: ReactNode; actions?: ReactNode }) {
   return (
-    <div className="mt-2 mb-3 flex flex-wrap items-end justify-between gap-2">
+    <div className="section-heading">
       <div>
-        <h2 className="text-sm font-semibold tracking-wide text-ink uppercase">{children}</h2>
-        {hint && <p className="mt-0.5 text-[13px] text-ink-2">{hint}</p>}
+        <h2>{children}</h2>
+        {hint && <p>{hint}</p>}
       </div>
       {actions}
     </div>

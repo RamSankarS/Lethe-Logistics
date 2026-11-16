@@ -1,5 +1,4 @@
 import { useMemo, useState, type ReactNode } from 'react'
-import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, ChevronsUpDown, Download, Search } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { downloadCsv } from '@/lib/csv'
 import { EmptyState } from './Feedback'
@@ -50,10 +49,10 @@ export function DataTable<T>({
   columns,
   rowKey,
   searchText,
-  searchPlaceholder = 'Search…',
+  searchPlaceholder = 'Search...',
   toolbar,
   onRowClick,
-  emptyTitle = 'Nothing here yet',
+  emptyTitle = 'No data found',
   emptyText,
   pageSize = 10,
   initialSort,
@@ -101,58 +100,45 @@ export function DataTable<T>({
   const showToolbar = Boolean(searchText || toolbar || exportRow)
 
   return (
-    <div className={cn(!bare && 'overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_1px_2px_rgba(16,24,40,0.04)]', className)}>
+    <div className={cn(!bare && 'table-wrap', className)}>
       {showToolbar && (
-        <div className="flex flex-wrap items-center gap-2 border-b border-line px-4 py-3">
+        <div className="table-toolbar">
           {searchText && (
-            <div className="relative w-full max-w-xs min-w-[180px] flex-1">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" />
-              <input
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value)
-                  setPage(0)
-                }}
-                placeholder={searchPlaceholder}
-                className="h-9 w-full rounded-lg border border-line bg-surface-2 pr-3 pl-9 text-sm text-ink outline-none placeholder:text-muted focus:border-accent focus:bg-surface focus:ring-[3px] focus:ring-accent/15"
-              />
-            </div>
+            <input
+              className="search-box"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                setPage(0)
+              }}
+              placeholder={searchPlaceholder}
+            />
           )}
-          <div className="flex flex-1 flex-wrap items-center justify-end gap-2">
+          <div className="toolbar-right">
             {toolbar}
             {exportRow && (
-              <button
-                onClick={() => downloadCsv(exportName ?? 'lethe-export', filtered.map(exportRow))}
-                disabled={!filtered.length}
-                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] font-medium text-ink-2 hover:bg-surface-2 disabled:opacity-50"
-              >
-                <Download className="size-4" /> CSV
+              <button className="btn btn-grey btn-small" onClick={() => downloadCsv(exportName ?? 'lethe-export', filtered.map(exportRow))} disabled={!filtered.length}>
+                Export CSV
               </button>
             )}
           </div>
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] border-collapse text-left text-[13.5px]">
+      <div className="table-scroll">
+        <table className="my-table">
           <thead>
-            <tr className="border-b border-line bg-surface-2">
+            <tr>
               {columns.map((c) => (
                 <th
                   key={c.key}
                   scope="col"
-                  className={cn(
-                    'px-4 py-2.5 text-[11.5px] font-semibold tracking-wide whitespace-nowrap text-muted uppercase',
-                    c.align === 'right' && 'text-right',
-                    c.align === 'center' && 'text-center',
-                    c.hideBelow && HIDE[c.hideBelow],
-                    c.headerClassName,
-                  )}
+                  className={cn(c.align === 'right' && 'text-right', c.align === 'center' && 'text-center', c.hideBelow && HIDE[c.hideBelow], c.headerClassName)}
                 >
                   {c.sort ? (
-                    <button onClick={() => toggleSort(c.key)} className={cn('inline-flex items-center gap-1 uppercase hover:text-ink', c.align === 'right' && 'flex-row-reverse')}>
+                    <button onClick={() => toggleSort(c.key)} className="sort-btn" title="Sort">
                       {c.header}
-                      {sort?.key === c.key ? sort.dir === 'asc' ? <ArrowUp className="size-3.5" /> : <ArrowDown className="size-3.5" /> : <ChevronsUpDown className="size-3.5 opacity-40" />}
+                      {sort?.key === c.key && <span className="sort-arrow">{sort.dir === 'asc' ? '▲' : '▼'}</span>}
                     </button>
                   ) : (
                     c.header
@@ -164,30 +150,20 @@ export function DataTable<T>({
           <tbody>
             {loading
               ? Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i} className="border-b border-line last:border-0">
+                  <tr key={i}>
                     {columns.map((c) => (
-                      <td key={c.key} className={cn('px-4 py-3.5', c.hideBelow && HIDE[c.hideBelow])}>
-                        <div className="h-4 w-3/4 animate-pulse rounded bg-surface-3" />
+                      <td key={c.key} className={cn(c.hideBelow && HIDE[c.hideBelow])}>
+                        <div className="loading-bar" />
                       </td>
                     ))}
                   </tr>
                 ))
               : visible.map((row) => (
-                  <tr
-                    key={rowKey(row)}
-                    onClick={onRowClick ? () => onRowClick(row) : undefined}
-                    className={cn('border-b border-line transition-colors last:border-0', onRowClick && 'cursor-pointer hover:bg-surface-2', rowClassName?.(row))}
-                  >
+                  <tr key={rowKey(row)} onClick={onRowClick ? () => onRowClick(row) : undefined} className={cn(onRowClick && 'clickable-row', rowClassName?.(row))}>
                     {columns.map((c) => (
                       <td
                         key={c.key}
-                        className={cn(
-                          'px-4 py-3 align-middle text-ink',
-                          c.align === 'right' && 'text-right tabular',
-                          c.align === 'center' && 'text-center',
-                          c.hideBelow && HIDE[c.hideBelow],
-                          c.className,
-                        )}
+                        className={cn(c.align === 'right' && 'text-right tabular', c.align === 'center' && 'text-center', c.hideBelow && HIDE[c.hideBelow], c.className)}
                       >
                         {c.cell(row)}
                       </td>
@@ -196,25 +172,23 @@ export function DataTable<T>({
                 ))}
           </tbody>
         </table>
-        {!loading && filtered.length === 0 && <EmptyState title={query ? 'No matches' : emptyTitle}>{query ? `Nothing matches “${query}”.` : emptyText}</EmptyState>}
+        {!loading && filtered.length === 0 && <EmptyState title={query ? 'No matches' : emptyTitle}>{query ? `Nothing matches "${query}".` : emptyText}</EmptyState>}
       </div>
 
       {!loading && filtered.length > pageSize && (
-        <div className="flex items-center justify-between gap-2 border-t border-line px-4 py-2.5 text-[13px] text-ink-2">
-          <span className="tabular">
-            {current * pageSize + 1}–{Math.min(filtered.length, (current + 1) * pageSize)} of {filtered.length}
+        <div className="pager">
+          <span>
+            Showing {current * pageSize + 1} to {Math.min(filtered.length, (current + 1) * pageSize)} of {filtered.length}
           </span>
-          <div className="flex items-center gap-1">
-            <button onClick={() => setPage(current - 1)} disabled={current === 0} className="grid size-8 place-items-center rounded-lg hover:bg-surface-3 disabled:opacity-40" aria-label="Previous page">
-              <ChevronLeft className="size-4" />
+          <span>
+            <button onClick={() => setPage(current - 1)} disabled={current === 0}>
+              &laquo; Prev
             </button>
-            <span className="tabular px-1">
-              {current + 1} / {pages}
-            </span>
-            <button onClick={() => setPage(current + 1)} disabled={current >= pages - 1} className="grid size-8 place-items-center rounded-lg hover:bg-surface-3 disabled:opacity-40" aria-label="Next page">
-              <ChevronRight className="size-4" />
+            Page {current + 1} of {pages}
+            <button onClick={() => setPage(current + 1)} disabled={current >= pages - 1}>
+              Next &raquo;
             </button>
-          </div>
+          </span>
         </div>
       )}
     </div>

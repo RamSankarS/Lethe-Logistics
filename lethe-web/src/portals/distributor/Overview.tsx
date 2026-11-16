@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router'
-import { AlertTriangle, Boxes, CalendarX2, Gauge, PackageCheck, ShieldAlert, Snowflake, Thermometer, Truck, Warehouse } from 'lucide-react'
+import { AlertTriangle, Boxes, CalendarX2, Gauge, PackageCheck, ShieldAlert, Snowflake, Thermometer, Truck } from 'lucide-react'
 import { useProfile } from '@/auth/AuthProvider'
 import { useLookups, useTables } from '@/data/hooks'
 import { PageHeader } from '@/components/layout/PageContext'
@@ -85,35 +85,30 @@ export function Overview() {
         <Stat label="In transit" value={num(orders.inTransit.length)} sub={`${orders.delayed.length} delayed`} icon={Truck} tone="accent" loading={t.isLoading} onClick={() => navigate('/distributor/fleet')} />
       </StatGrid>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
+      <div className="dist-wh-grid grid md:grid-cols-2 2xl:grid-cols-3">
         {m.warehouses.map((w) => {
           const ratio = w.capacity ? w.stock / w.capacity : 0
           return (
-            <Card key={w.w.warehouse_id} className={cn('p-4', !w.w.is_active && 'opacity-60')}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex min-w-0 items-start gap-3">
-                  <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
-                    <Warehouse className="size-[18px]" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-[14.5px] font-semibold text-ink">{w.w.warehouse_name}</p>
-                    <p className="text-[12.5px] text-ink-2">
-                      {w.w.city}, {w.w.state} · manager {L.userName(w.w.manager_user_id)}
-                    </p>
-                  </div>
+            <Card key={w.w.warehouse_id} className={cn('dist-wh-box', !w.w.is_active && 'dist-faded')}>
+              <div className="dist-wh-top">
+                <div className="dist-wh-info">
+                  <p className="dist-wh-name">{w.w.warehouse_name}</p>
+                  <p className="dist-wh-city">
+                    {w.w.city}, {w.w.state} · manager {L.userName(w.w.manager_user_id)}
+                  </p>
                 </div>
                 {!w.w.is_active ? <Badge>Inactive</Badge> : w.breaches > 0 ? <Badge tone="critical" icon={AlertTriangle}>{plural(w.breaches, 'breach', 'breaches')}</Badge> : <Badge tone="good" dot>Nominal</Badge>}
               </div>
-              <div className="mt-4">
-                <div className="mb-1.5 flex items-baseline justify-between text-[12.5px]">
-                  <span className="text-ink-2">Capacity</span>
-                  <span className="text-ink tabular">
-                    <b className="font-semibold">{compact(w.stock)}</b> / {compact(w.capacity)} · {pct(ratio)}
+              <div className="dist-capacity">
+                <div className="dist-capacity-row">
+                  <span className="dist-grey">Capacity</span>
+                  <span>
+                    <b>{compact(w.stock)}</b> / {compact(w.capacity)} · {pct(ratio)}
                   </span>
                 </div>
                 <Meter value={w.stock} max={w.capacity} />
               </div>
-              <div className="mt-3 flex flex-wrap gap-1.5">
+              <div className="dist-tag-row">
                 <Badge tone="info" icon={Snowflake}>
                   {w.cold.length} cold
                 </Badge>
@@ -125,7 +120,7 @@ export function Overview() {
         })}
       </div>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-5">
+      <div className="dist-chart-row grid gap-5 xl:grid-cols-5">
         <Card className="xl:col-span-3">
           <CardHeader title="Stock by facility" subtitle="Units on hand, split by zone type" />
           <CardBody>
@@ -143,20 +138,20 @@ export function Overview() {
         </Card>
         <Card className="xl:col-span-2">
           <CardHeader title="Alerts" subtitle={`${alerts.length} items need attention`} icon={AlertTriangle} />
-          <CardBody className="px-0 pb-2">
+          <CardBody className="dist-alerts-body">
             {alerts.length === 0 ? (
               <EmptyState title="All clear" />
             ) : (
-              <ul className="max-h-[300px] divide-y divide-line overflow-y-auto">
+              <ul className="dist-alert-list">
                 {alerts.map((a) => (
                   <li key={a.id}>
-                    <button onClick={() => navigate(a.to)} className="flex w-full items-start gap-3 px-5 py-2.5 text-left hover:bg-surface-2">
-                      <Badge tone={a.tone} icon={a.icon} className="mt-0.5 px-1.5">
+                    <button onClick={() => navigate(a.to)} className="dist-alert-btn">
+                      <Badge tone={a.tone} icon={a.icon} className="dist-alert-tag">
                         {a.tone === 'critical' ? 'Critical' : a.tone === 'serious' ? 'Serious' : 'Warning'}
                       </Badge>
-                      <span className="min-w-0">
-                        <span className="block truncate text-[13px] font-medium text-ink">{a.title}</span>
-                        <span className="block truncate text-xs text-ink-2">{a.detail}</span>
+                      <span className="dist-alert-text">
+                        <span className="dist-alert-title">{a.title}</span>
+                        <span className="dist-alert-detail">{a.detail}</span>
                       </span>
                     </button>
                   </li>

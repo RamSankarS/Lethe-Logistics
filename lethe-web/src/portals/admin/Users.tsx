@@ -106,12 +106,12 @@ function Provision({ open, onClose }: { open: boolean; onClose: () => void }) {
     >
       {result ? (
         <Callout tone="good" title="Identity created">
-          <b className="text-ink">{result.email}</b> can now sign in to the {portal ? PORTALS[portal].name : 'assigned portal'}.
-          {result.confirm && <span className="mt-1 block">Your Supabase project requires email confirmation, so the user must click the link in their inbox before the first sign-in.</span>}
-          <span className="mt-1 block">Share the temporary password through a secure channel; it is not stored anywhere in Lethe.</span>
+          <b className="admin-result-email">{result.email}</b> can now sign in to the {portal ? PORTALS[portal].name : 'assigned portal'}.
+          {result.confirm && <span className="admin-result-line">Your Supabase project requires email confirmation, so the user must click the link in their inbox before the first sign-in.</span>}
+          <span className="admin-result-line">Share the temporary password through a secure channel; it is not stored anywhere in Lethe.</span>
         </Callout>
       ) : (
-        <div className="space-y-4">
+        <div className="admin-modal-form">
           <FormGrid>
             <Field label="First name" required>
               <Input value={first} onChange={(e) => setFirst(e.target.value)} />
@@ -123,7 +123,7 @@ function Provision({ open, onClose }: { open: boolean; onClose: () => void }) {
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@org.in" />
             </Field>
             <Field label="Temporary password" required hint="At least 8 characters. Generated securely in your browser.">
-              <div className="flex gap-2">
+              <div className="admin-pass-row">
                 <Input value={password} onChange={(e) => setPassword(e.target.value)} className="font-mono" />
                 <Button icon={Shuffle} aria-label="Generate password" onClick={() => setPassword(randomPassword())} />
               </div>
@@ -208,7 +208,7 @@ function EditUser({ user, onClose }: { user: AppUser | null; onClose: () => void
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="admin-modal-form">
         <Field label="Organisation">
           <Select value={orgId} onChange={(e) => setOrgId(e.target.value)}>
             {data.organisations.map((o) => (
@@ -267,11 +267,11 @@ export function Users() {
     )
 
   const cols: Column<Row>[] = [
-    { key: 'name', header: 'User', sort: (r) => fullName(r.u), cell: (r) => <div><p className="font-medium text-ink">{fullName(r.u)}</p><p className="font-mono text-[11px] text-muted">{r.u.user_id.slice(0, 8)}</p></div> },
-    { key: 'org', header: 'Organisation', sort: (r) => r.org?.org_name ?? '', cell: (r) => <span className="text-[13px]">{r.org?.org_name ?? '—'}</span> },
-    { key: 'role', header: 'Role', sort: (r) => r.role?.role_name ?? '', cell: (r) => <span className="text-[13px] text-ink-2">{r.role ? humanize(r.role.role_name) : 'Unassigned'}</span>, hideBelow: 'md' },
+    { key: 'name', header: 'User', sort: (r) => fullName(r.u), cell: (r) => <div><p className="admin-cell-main">{fullName(r.u)}</p><p className="admin-cell-id">{r.u.user_id.slice(0, 8)}</p></div> },
+    { key: 'org', header: 'Organisation', sort: (r) => r.org?.org_name ?? '', cell: (r) => <span className="admin-cell-text">{r.org?.org_name ?? '—'}</span> },
+    { key: 'role', header: 'Role', sort: (r) => r.role?.role_name ?? '', cell: (r) => <span className="admin-cell-text">{r.role ? humanize(r.role.role_name) : 'Unassigned'}</span>, hideBelow: 'md' },
     { key: 'portal', header: 'Portal', sort: (r) => r.portal ?? 'zz', cell: (r) => (r.portal ? <Badge tone="accent">{PORTALS[r.portal].short}</Badge> : <Badge>None</Badge>) },
-    { key: 'since', header: 'Created', sort: (r) => r.u.created_at_utc, cell: (r) => <span className="text-[13px] text-ink-2 tabular">{date(r.u.created_at_utc)}</span>, hideBelow: 'xl' },
+    { key: 'since', header: 'Created', sort: (r) => r.u.created_at_utc, cell: (r) => <span className="admin-cell-text">{date(r.u.created_at_utc)}</span>, hideBelow: 'xl' },
     { key: 'active', header: 'Active', cell: (r) => <Switch checked={r.u.is_active} disabled={busy === `user-${r.u.user_id}` || r.u.user_id === profile.user_id} onChange={(v) => void setActive(r.u, v)} label={`Toggle ${fullName(r.u)}`} /> },
     { key: 'edit', header: '', cell: (r) => <Button size="xs" variant="ghost" icon={Pencil} onClick={() => setEditing(r.u)} disabled={r.u.user_id === profile.user_id}>Edit</Button> },
   ]
@@ -287,7 +287,7 @@ export function Users() {
         <Stat label="Roles" value={num(t.data.roles.length)} sub="defined in identity_mod.roles" icon={KeyRound} tone="info" />
         <Stat label="Without a portal" value={num(count('none'))} sub="e.g. transporter drivers" icon={UsersIcon} tone="warn" />
       </StatGrid>
-      <div className="mt-5 mb-3">
+      <div className="admin-filter-row">
         <Segmented
           value={portalFilter}
           onChange={setPortalFilter}
@@ -295,7 +295,7 @@ export function Users() {
         />
       </div>
       <DataTable rows={shown} columns={cols} rowKey={(r) => r.u.user_id} loading={t.isLoading} searchText={(r) => `${fullName(r.u)} ${r.org?.org_name ?? ''} ${r.role?.role_name ?? ''}`} initialSort={{ key: 'name', dir: 'asc' }} pageSize={12} />
-      <Callout tone="neutral" className="mt-5">
+      <Callout tone="neutral" className="admin-note-box">
         Password hashes are never sent to the browser: Supabase Auth owns credentials, and Lethe only stores the profile, organisation and role.
       </Callout>
       <Provision open={provisioning} onClose={() => setProvisioning(false)} />

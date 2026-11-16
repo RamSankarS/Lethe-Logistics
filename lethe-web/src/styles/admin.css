@@ -1,0 +1,495 @@
+/* =========================================================
+   admin portal styles
+   (system health, organisations, users, access control,
+   sessions). the buttons / boxes / tables come from main.css,
+   this is only the extra stuff for the admin pages
+   ========================================================= */
+
+/* ---------- spacing between the big blocks ---------- */
+
+.admin-health-grid {
+  margin-top: 18px;
+}
+
+.admin-access-grid {
+  margin-top: 22px;
+}
+
+.admin-sessions-grid {
+  margin-top: 19px;
+}
+
+/* the 2 boxes on the right side of system health */
+.admin-side-col .box-1 {
+  margin-bottom: 18px;
+}
+
+.admin-side-col .box-1:last-child {
+  margin-bottom: 0px;
+}
+
+.admin-trigger-box {
+  margin-top: 23px;
+}
+
+/* the All / Retailer / ... buttons above the tables */
+.admin-filter-row {
+  margin: 18px 0 11px 0;
+}
+
+/* grey note box at the bottom of the pages */
+.admin-note-box {
+  margin-top: 21px;
+}
+
+/* ---------- system health: data volume ---------- */
+
+.admin-schema-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333333;
+  margin: 0 0 7px 0;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #CCCCCC;
+}
+
+.admin-schema-name {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 13px;
+  font-weight: normal;
+  color: #777777;
+}
+
+.admin-count-list {
+  margin-bottom: 4px;
+}
+
+/* name on the left, number on the right, bar underneath */
+.admin-count-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 2px;
+  margin-bottom: 7px;
+}
+
+.admin-table-name {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 13px;
+  min-width: 0; /* without this the long names don't get the ... */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-count-num {
+  font-size: 13px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.admin-count-meter {
+  grid-column: 1 / 3;
+  height: 8px;
+}
+
+.admin-small-grey {
+  font-size: 12px;
+  color: #777777;
+}
+
+/* ---------- system health: stack box ---------- */
+
+.admin-stack-body {
+  font-size: 13px;
+  line-height: normal;
+}
+
+.admin-stack-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0 5px 0;
+  border-bottom: 1px dotted #BBBBBB;
+}
+
+.admin-stack-row:last-child {
+  border-bottom: none;
+}
+
+.admin-stack-key {
+  font-weight: bold;
+  color: #555555;
+  white-space: nowrap;
+}
+
+.admin-stack-val {
+  text-align: right;
+  color: #000000;
+}
+
+/* ---------- system health: triggers table ---------- */
+
+/* table sits inside the grey box with a bit of space around it */
+.admin-table-holder {
+  overflow-x: auto;
+  margin: 0 14px 14px 14px;
+}
+
+.admin-trigger-table {
+  min-width: 720px;
+  font-size: 13px;
+  background-color: #FFFFFF;
+}
+
+.admin-mono-cell {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 13px;
+}
+
+.admin-nowrap-cell {
+  white-space: nowrap;
+}
+
+/* ---------- table cells (organisations, users, sessions) ---------- */
+
+.admin-cell-main {
+  font-weight: bold;
+}
+
+.admin-cell-sub {
+  font-size: 12px;
+  color: #666666;
+  margin-top: 1px;
+}
+
+.admin-cell-id {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  color: #888888;
+}
+
+.admin-cell-text {
+  font-size: 13px;
+}
+
+.admin-cell-none {
+  font-size: 12px;
+  font-style: italic;
+  color: #999999;
+}
+
+.admin-cell-ip {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 13px;
+}
+
+/* ---------- popups (onboard, provision, edit, new role...) ---------- */
+
+.admin-modal-form > div {
+  margin-bottom: 14px;
+}
+
+.admin-modal-form > div:last-child {
+  margin-bottom: 0;
+}
+
+/* password box + the shuffle button next to it */
+.admin-pass-row {
+  display: flex;
+  gap: 6px;
+}
+
+/* main.css makes every <b> inside an alert a block, so the email
+   ended up on its own line. this puts it back */
+.admin-result-email {
+  display: inline !important;
+}
+
+.admin-result-line {
+  display: block;
+  margin-top: 5px;
+}
+
+/* ---------- access control: the big matrix ---------- */
+
+.admin-matrix-scroll {
+  overflow-x: auto;
+  margin: 0 12px 15px 15px;
+}
+
+.admin-matrix-table {
+  min-width: 760px;
+  font-size: 13px;
+  background-color: #FFFFFF;
+}
+
+.admin-matrix-table th {
+  text-align: center;
+  vertical-align: bottom;
+  padding: 7px 6px;
+}
+
+/* role column stays on the left when you scroll sideways */
+.admin-matrix-table th.admin-matrix-rolehead {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: left;
+  padding: 7px 12px;
+}
+
+.admin-matrix-module {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  color: #666666;
+}
+
+.admin-matrix-action {
+  display: block;
+  margin-top: 2px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.admin-matrix-table td {
+  text-align: center;
+  padding: 5px 4px;
+}
+
+.admin-matrix-table td.admin-matrix-role {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: left;
+  padding: 7px 13px 7px 12px;
+  background-color: #FFFFFF; /* needs a colour or the cells show through when scrolling */
+}
+
+.admin-matrix-table tbody tr:nth-child(even) td.admin-matrix-role {
+  background-color: #F9F9F9; /* same as the stripes in main.css */
+}
+
+.admin-role-name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.admin-role-desc {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #666666;
+}
+
+/* the tick boxes. they are buttons but i made them look like checkboxes */
+.admin-matrix-cell {
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: 0 auto;
+  padding: 0;
+  border: 1px solid #888888;
+  border-radius: 0px;
+  background-color: #FFFFFF;
+  color: #000000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.admin-matrix-cell:hover {
+  background-color: #E2E2E2;
+}
+
+.admin-cell-on {
+  border-color: #333333;
+}
+
+.admin-matrix-cell:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+/* ---------- access control: routing rules + permissions ---------- */
+
+.admin-rule-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 11px;
+  margin-bottom: 7px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 3px;
+  line-height: normal;
+}
+
+.admin-rule-when {
+  font-size: 13px;
+}
+
+.admin-rule-target {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #0066CC;
+}
+
+.admin-rule-arrow {
+  width: 14px;
+  height: 14px;
+  color: #888888;
+}
+
+.admin-small-note {
+  font-size: 12px;
+  color: #666666;
+  padding-top: 4px;
+}
+
+.admin-perm-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 3px 7px 3px;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.admin-perm-row:last-child {
+  border-bottom: none;
+}
+
+.admin-perm-info {
+  font-size: 12px;
+  color: #555555;
+  text-align: right;
+}
+
+/* ---------- sessions: identity events list ---------- */
+
+/* box-body has padding on the sides but the list should go edge to edge */
+.admin-feed-body {
+  padding: 0 0 6px 0 !important;
+}
+
+.admin-feed-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-feed-item {
+  padding: 8px 15px 9px 14px;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.admin-feed-item:last-child {
+  border-bottom: none;
+}
+
+.admin-feed-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.admin-feed-action {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.admin-feed-meta {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #666666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   night mode for the admin pages
+   ========================================================= */
+
+[data-theme="dark"] .admin-trigger-table,
+[data-theme="dark"] .admin-matrix-table {
+  background-color: #333333;
+}
+
+[data-theme="dark"] .admin-matrix-table td.admin-matrix-role {
+  background-color: #333333;
+}
+
+[data-theme="dark"] .admin-matrix-table tbody tr:nth-child(even) td.admin-matrix-role {
+  background-color: #383838;
+}
+
+[data-theme="dark"] .admin-matrix-cell {
+  background-color: #1E1E1E;
+  border-color: #777777;
+  color: #E6E6E6;
+}
+
+[data-theme="dark"] .admin-matrix-cell:hover {
+  background-color: #444444;
+}
+
+[data-theme="dark"] .admin-cell-on {
+  border-color: #B5B5B5;
+}
+
+[data-theme="dark"] .admin-rule-row {
+  background-color: #333333 !important;
+  border-color: #555555 !important;
+}
+
+[data-theme="dark"] .admin-rule-target {
+  color: #66B2FF;
+}
+
+[data-theme="dark"] .admin-schema-title,
+[data-theme="dark"] .admin-stack-val {
+  color: #E6E6E6;
+}
+
+[data-theme="dark"] .admin-schema-title,
+[data-theme="dark"] .admin-stack-row,
+[data-theme="dark"] .admin-perm-row,
+[data-theme="dark"] .admin-feed-item {
+  border-color: #555555;
+}
+
+/* grey text was too dark on the black background (same as main.css) */
+[data-theme="dark"] .admin-schema-name,
+[data-theme="dark"] .admin-small-grey,
+[data-theme="dark"] .admin-stack-key,
+[data-theme="dark"] .admin-cell-sub,
+[data-theme="dark"] .admin-cell-id,
+[data-theme="dark"] .admin-cell-none,
+[data-theme="dark"] .admin-matrix-module,
+[data-theme="dark"] .admin-role-desc,
+[data-theme="dark"] .admin-rule-arrow,
+[data-theme="dark"] .admin-small-note,
+[data-theme="dark"] .admin-perm-info,
+[data-theme="dark"] .admin-feed-meta {
+  color: #B5B5B5;
+}

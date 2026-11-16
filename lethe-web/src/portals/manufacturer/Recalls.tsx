@@ -105,7 +105,7 @@ function InitiateRecall({ open, onClose }: { open: boolean; onClose: () => void 
           </>
         }
       >
-        <div className="space-y-4">
+        <div className="mfr-stack">
           <Field label="Batch to recall" required>
             <Select value={batchId} onChange={(e) => setBatchId(e.target.value)}>
               <option value="">Choose a batch…</option>
@@ -122,10 +122,10 @@ function InitiateRecall({ open, onClose }: { open: boolean; onClose: () => void 
                 key={c.id}
                 type="button"
                 onClick={() => setCls(c.id)}
-                className={`rounded-xl border p-3 text-left transition-colors ${cls === c.id ? 'border-critical bg-critical-soft' : 'border-line hover:bg-surface-2'}`}
+                className={`mfr-class-btn ${cls === c.id ? 'mfr-class-btn-on' : ''}`}
               >
-                <p className={`text-[13px] font-semibold ${cls === c.id ? 'text-critical-text' : 'text-ink'}`}>{c.id}</p>
-                <p className="mt-0.5 text-xs text-ink-2">{c.hint}</p>
+                <p className={`mfr-class-name ${cls === c.id ? 'mfr-class-name-on' : ''}`}>{c.id}</p>
+                <p className="mfr-class-hint">{c.hint}</p>
               </button>
             ))}
           </div>
@@ -133,7 +133,7 @@ function InitiateRecall({ open, onClose }: { open: boolean; onClose: () => void 
             <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Sub-standard dissolution rate detected in post-market surveillance." />
           </Field>
           <Field label="Channels">
-            <div className="flex flex-wrap gap-4">
+            <div className="mfr-channel-row">
               {COMM_CHANNELS.map((c) => (
                 <Checkbox key={c} label={humanize(c)} checked={channels.includes(c)} onChange={(v) => setChannels((p) => (v ? [...p, c] : p.filter((x) => x !== c)))} />
               ))}
@@ -141,13 +141,13 @@ function InitiateRecall({ open, onClose }: { open: boolean; onClose: () => void 
           </Field>
           {batch && (
             <div>
-              <p className="mb-2 text-[13px] font-medium text-ink">
-                Recipients <span className="text-ink-2">({recipients.length} of {impacted.length})</span>
+              <p className="mfr-recip-title">
+                Recipients <span className="mfr-grey-text">({recipients.length} of {impacted.length})</span>
               </p>
-              <div className="max-h-48 space-y-1.5 overflow-y-auto rounded-xl border border-line p-2">
-                {impacted.length === 0 && <p className="p-2 text-[13px] text-ink-2">No partner organisations found.</p>}
+              <div className="mfr-recip-box">
+                {impacted.length === 0 && <p className="mfr-recip-empty">No partner organisations found.</p>}
                 {impacted.map((i) => (
-                  <div key={i.org.org_id} className="flex items-center justify-between gap-3 rounded-lg px-2 py-1.5 hover:bg-surface-2">
+                  <div key={i.org.org_id} className="mfr-recip-row">
                     <Checkbox
                       label={i.org.org_name}
                       description={ORG_TYPE_LABEL[i.org.org_type]}
@@ -180,7 +180,7 @@ function InitiateRecall({ open, onClose }: { open: boolean; onClose: () => void 
         title={`Recall ${batch?.batch_number ?? ''}?`}
         confirmLabel="Broadcast recall"
       >
-        This writes a <b className="text-ink">{cls}</b> recall to the global recall ledger, locks the batch as <b className="text-ink">Recalled</b> (irreversible) and sends{' '}
+        This writes a <b className="mfr-strong">{cls}</b> recall to the global recall ledger, locks the batch as <b className="mfr-strong">Recalled</b> (irreversible) and sends{' '}
         {recipients.length * channels.length} notices to {recipients.length} organisations. The database records a CRITICAL event in the audit ledger.
       </ConfirmDialog>
     </>
@@ -229,23 +229,23 @@ function RecallCard({ recall }: { recall: Recall }) {
 
   return (
     <Card>
-      <CardBody className="pt-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      <CardBody className="mfr-recall-body">
+        <div className="mfr-recall-top">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[13px] font-semibold text-ink">Recall #{recall.recall_id}</span>
+            <div className="mfr-recall-tags">
+              <span className="mfr-recall-id">Recall #{recall.recall_id}</span>
               <StatusBadge value={recall.quarantine_status} meta={RECALL_STATUS} />
               {batch && <Code>{batch.batch_number}</Code>}
               {batch && <StatusBadge value={batch.status} meta={BATCH_STATUS} />}
             </div>
-            <p className="mt-2 text-[15px] font-semibold text-ink">{L.medOf(batch)?.brand_name ?? 'Unknown medicine'}</p>
-            <p className="mt-1 max-w-3xl text-[13px] leading-5 text-ink-2">{recall.recall_reason}</p>
-            <p className="mt-1 text-xs text-muted">
+            <p className="mfr-recall-med">{L.medOf(batch)?.brand_name ?? 'Unknown medicine'}</p>
+            <p className="mfr-recall-reason">{recall.recall_reason}</p>
+            <p className="mfr-recall-meta">
               Initiated by {L.orgName(recall.initiated_by_org_id)} · {dateTime(recall.created_at_utc)} ({relative(recall.created_at_utc)})
             </p>
           </div>
           {recall.quarantine_status === 'Active' && (
-            <div className="flex flex-wrap gap-2">
+            <div className="mfr-recall-actions">
               <Button size="sm" icon={BellRing} disabled={!unacked.length} loading={busy === `remind-${recall.recall_id}`} onClick={() => void remind()}>
                 Remind {unacked.length || ''}
               </Button>
@@ -259,9 +259,9 @@ function RecallCard({ recall }: { recall: Recall }) {
           )}
         </div>
 
-        <div className="mt-5 grid gap-5 lg:grid-cols-3">
+        <div className="mfr-recall-grid grid gap-5 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <p className="mb-2 text-[12px] font-semibold tracking-wide text-muted uppercase">
+            <p className="mfr-sub-heading">
               Notification delivery · {comms.length} notices to {orgsNotified.size} organisations
             </p>
             <SegmentedBar
@@ -274,35 +274,35 @@ function RecallCard({ recall }: { recall: Recall }) {
             />
           </div>
           <div className="grid grid-cols-3 gap-2 lg:grid-cols-1">
-            <div className="rounded-xl bg-surface-2 px-3 py-2">
-              <p className="text-[11.5px] text-muted">Orgs acknowledged</p>
-              <p className="text-[15px] font-semibold text-ink tabular">
-                {orgsAcked.size}/{orgsNotified.size} <span className="text-xs font-normal text-ink-2">{pct(orgsNotified.size ? orgsAcked.size / orgsNotified.size : 0)}</span>
+            <div className="mfr-mini-stat">
+              <p className="mfr-mini-label">Orgs acknowledged</p>
+              <p className="mfr-mini-number">
+                {orgsAcked.size}/{orgsNotified.size} <span className="mfr-mini-small">{pct(orgsNotified.size ? orgsAcked.size / orgsNotified.size : 0)}</span>
               </p>
             </div>
-            <div className="rounded-xl bg-surface-2 px-3 py-2">
-              <p className="text-[11.5px] text-muted">Units returned</p>
-              <p className="text-[15px] font-semibold text-ink tabular">
-                {num(returnedQty)} <span className="text-xs font-normal text-ink-2">in {returns.length} returns</span>
+            <div className="mfr-mini-stat">
+              <p className="mfr-mini-label">Units returned</p>
+              <p className="mfr-mini-number">
+                {num(returnedQty)} <span className="mfr-mini-small">in {returns.length} returns</span>
               </p>
             </div>
-            <div className="rounded-xl bg-surface-2 px-3 py-2">
-              <p className="text-[11.5px] text-muted">Cost of non-compliance</p>
-              <p className="text-[15px] font-semibold text-ink tabular">{money(cost?.total_financial_loss ?? 0)}</p>
+            <div className="mfr-mini-stat">
+              <p className="mfr-mini-label">Cost of non-compliance</p>
+              <p className="mfr-mini-number">{money(cost?.total_financial_loss ?? 0)}</p>
             </div>
           </div>
         </div>
 
         {comms.length > 0 && (
-          <details className="group mt-4">
-            <summary className="cursor-pointer text-[13px] font-medium text-accent-text select-none">Show notices by organisation</summary>
-            <div className="mt-3 grid gap-2 md:grid-cols-2">
+          <details className="mfr-notice-details">
+            <summary className="mfr-notice-summary">Show notices by organisation</summary>
+            <div className="mfr-notice-grid grid gap-2 md:grid-cols-2">
               {[...orgsNotified].map((orgId) => {
                 const mine = comms.filter((c) => c.notified_org_id === orgId)
                 return (
-                  <div key={orgId} className="rounded-xl border border-line px-3 py-2">
-                    <p className="text-[13px] font-medium text-ink">{L.orgName(orgId)}</p>
-                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  <div key={orgId} className="mfr-notice-box">
+                    <p className="mfr-notice-org">{L.orgName(orgId)}</p>
+                    <div className="mfr-notice-tags">
                       {mine.map((c) => (
                         <Badge key={c.log_id} tone={COMM_STATUS[c.delivery_status].tone} dot title={dateTime(c.sent_at_utc)}>
                           {humanize(c.channel)}: {COMM_STATUS[c.delivery_status].label}
@@ -368,7 +368,7 @@ export function Recalls() {
         <Stat label="Cost of non-compliance" value={money(cost)} sub="refunds issued on recalls" icon={XCircle} tone="serious" />
       </StatGrid>
 
-      <div className="mt-5 space-y-4">
+      <div className="mfr-recall-list">
         {mine.length === 0 ? (
           <Card>
             <EmptyState icon={Siren} title="No recalls">
@@ -379,7 +379,7 @@ export function Recalls() {
           mine.map((r) => <RecallCard key={r.recall_id} recall={r} />)
         )}
         <Callout tone="neutral" title="How recalls work in Lethe">
-          Initiating a recall writes to <code className="font-mono">reverse_logistics.global_recall_ledger</code>; the <code className="font-mono">tr_audit_global_recall</code> trigger logs a CRITICAL event, and the
+          Initiating a recall writes to <code className="mfr-code">reverse_logistics.global_recall_ledger</code>; the <code className="mfr-code">tr_audit_global_recall</code> trigger logs a CRITICAL event, and the
           batch is locked as Recalled. Retailers see the notice in their portal and file returns against it.
         </Callout>
       </div>
