@@ -16,7 +16,7 @@ Passwords are the team's demo passwords (they are deliberately not stored in thi
 
 **Routing rule:** role `Admin` → SysAdmin portal; otherwise the organisation type decides (Manufacturer / Distributor / Retailer / Regulatory_Body). Opening another portal's URL shows an *access denied* screen. Deactivated users and suspended organisations are blocked at sign-in.
 
-**Database-enforced:** once [`supabase/rls.sql`](supabase/rls.sql) is applied, Postgres Row Level Security enforces the same separation, so it holds even for someone calling the API directly (see [Row Level Security](#row-level-security)).
+**Database-enforced:** Postgres Row Level Security ([`supabase/rls.sql`](supabase/rls.sql), live since 15 Nov 2026) enforces the same separation, so it holds even for someone calling the API directly (see [Row Level Security](#row-level-security)).
 
 ---
 
@@ -83,19 +83,19 @@ src/
 ```
 
 ### Developer preview (optional, dev only)
-Create `lethe-web/.env.development.local` with `VITE_DEV_PREVIEW=true` and restart `npm run dev`. The sign-in page then shows a picker to render any portal as a seeded identity **without signing in**. All writes are disabled in this mode and it never exists in `npm run build`. Delete the file to turn it off. It reads as a signed-out visitor, so it only works on a database **without** RLS; once `rls.sql` is applied, sign in for real.
+Create `lethe-web/.env.development.local` with `VITE_DEV_PREVIEW=true` and restart `npm run dev`. The sign-in page then shows a picker to render any portal as a seeded identity **without signing in**. All writes are disabled in this mode and it never exists in `npm run build`. Delete the file to turn it off. It reads as a signed-out visitor, so it only works on a database **without** RLS. RLS is on in the live project, so there the picker stays empty; sign in for real.
 
 ---
 
 ## Database notes (please read)
 
-1. **Rotate the leaked service key.** The old GitHub repo (`Scripts/provision_users.py`, `Scripts/test_service_key.py`) contains the Supabase **service_role** key. Anyone can use it to bypass all security. In Supabase → Project Settings → API Keys, roll/revoke it and delete those files from the repo history.
-2. **Row Level Security** is ready in [`supabase/rls.sql`](supabase/rls.sql) but has to be run once (see [below](#row-level-security)). Until then every table is open to anyone holding the publishable key, and the portals are separated only by the UI.
-3. **Optional fixes** in [`supabase/fixes.sql`](supabase/fixes.sql) (run in the SQL Editor, before or after `rls.sql`):
+1. **Leaked service key: revoked.** `Scripts/provision_users.py` and `Scripts/test_service_key.py` contained the Supabase **service_role** key. On 15 Nov 2026 the legacy JWT-based keys were switched off and the legacy JWT secret revoked, so that key no longer works. Anything still using the legacy `anon` or `service_role` keys (those scripts, the old Streamlit app) no longer connects; give scripts a new secret key from a local `.env`, never from git.
+2. **Row Level Security** is on in the live project (applied 15 Nov 2026 with [`supabase/rls.sql`](supabase/rls.sql), see [below](#row-level-security)). Signed-out requests are refused, and each portal reads and changes only its own slice.
+3. **Trigger fixes** in [`supabase/fixes.sql`](supabase/fixes.sql), applied to the live project on 15 Nov 2026 (safe to re-run, before or after `rls.sql`). They fix these bugs in the original triggers:
    * `fn_audit_spec_tampering` inserts into columns that don't exist, so editing a medicine's purity/pH fails (the app keeps specs read-only for this reason).
    * `check_user_permission` joins `role_permission` (singular) and errors when called.
    * `fn_monitor_temperature_breach` aborts the whole sensor insert if the shelf holds a recalled/rejected batch.
-   * **Dispatch is blocked for most stock today.** `fn_prevent_env_mismatch` also runs when stock *leaves* a shelf, and 14 of the 16 inventory rows sit on shelves whose temperature or humidity band doesn't match the medicine, so dispatching or moving them fails with *SAFETY LOCK: … Mismatch* (for example batch 6, the 5,000 vaccines). The fix always allows taking stock off a shelf and keeps every check for stock being added.
+   * **Dispatch was blocked for most stock.** `fn_prevent_env_mismatch` also ran when stock *left* a shelf, and 14 of the 16 inventory rows sit on shelves whose temperature or humidity band doesn't match the medicine, so dispatching or moving them failed with *SAFETY LOCK: … Mismatch* (for example batch 6, the 5,000 vaccines). The fix always allows taking stock off a shelf and keeps every check for stock being added.
 4. **Humidity data.** Every storage zone has a 60 % humidity limit, while several medicines (insulin 45 %, others 40–55 %) need less, so no zone can *receive* new stock of them. Add a zone with a lower humidity limit (Distributor → Facilities) before demoing an inbound delivery of those.
 5. **Legacy data.** Orders #11–#38 were created by the old Streamlit app without order lines, and several were set to *Shipped* directly. The new UI shows them honestly (*No lines*, *Overdue*). New orders always get lines and go through the database's sale gate. Recalls #2 and #3 were started by the SysAdmin's organisation on Avant-Garde batches; with RLS the batch's maker can still manage them.
 6. **Prices.** The schema has no price-list table. Unit prices come from historical order lines; medicines never sold use the category list prices in `src/data/pricing.ts`.
@@ -106,7 +106,8 @@ Create `lethe-web/.env.development.local` with `VITE_DEV_PREVIEW=true` and resta
 
 [`supabase/rls.sql`](supabase/rls.sql) makes Postgres itself decide which rows each signed-in user can read and change.
 
-**Apply:** Supabase Dashboard → SQL Editor → paste `rls.sql` → Run. It is one transaction (all or nothing), safe to run again, and ends by listing every table with its policy count.
+**Status:** applied to the live project on 15 Nov 2026. `verify_rls.sql` there gives the same counts as the local tests, cell for cell.
+**Apply (again, or on another project):** Supabase Dashboard → SQL Editor → paste `rls.sql` → Run. It is one transaction (all or nothing), safe to run again, and ends by listing every table with its policy count.
 **Check:** run [`supabase/verify_rls.sql`](supabase/verify_rls.sql): a read-only table of how many rows each demo login (and a signed-out visitor) can see per table.
 **Undo:** [`supabase/rls_rollback.sql`](supabase/rls_rollback.sql) puts the database back in its open state.
 
@@ -123,6 +124,6 @@ Also enforced: nobody signed out can read anything; deactivated users and suspen
 
 How it works: helper functions in a private `lethe_rls` schema (not exposed through the API) work out the caller's portal and organisation from `auth.uid()`. Each table has one policy per action, written as a `CASE` on the portal. Trigger functions run as their owner (`SECURITY DEFINER`), so automation such as invoices, quarantine and stock sync keeps working for every role. **If you edit a trigger function later, re-run `rls.sql`.**
 
-Limits of the data model: orders and warehouses have no seller/owner column, so all distributors share them; medicines have no owner, so any manufacturer curates the catalog. Add an owner column and tighten the policy if you add more distributors. The old Streamlit app (publishable key, no sign-in) stops working once RLS is on.
+Limits of the data model: orders and warehouses have no seller/owner column, so all distributors share them; medicines have no owner, so any manufacturer curates the catalog. Add an owner column and tighten the policy if you add more distributors. The old Streamlit app (publishable key, no sign-in) can no longer read the data now that RLS is on.
 
-**How it was tested:** on a throwaway local PostgreSQL 18 loaded with your schema and a read-only copy of the live data (nothing was written to the live project): a read matrix for every role, 140 write checks shaped like the API's requests (every allowed flow end to end, plus the forbidden ones), the `fixes.sql` interplay in both orders, re-running, and the rollback.
+**How it was tested:** on a throwaway local PostgreSQL 18 loaded with your schema and a read-only copy of the live data (nothing was written to the live project): a read matrix for every role, 140 write checks shaped like the API's requests (every allowed flow end to end, plus the forbidden ones), the `fixes.sql` interplay in both orders, re-running, and the rollback. Then both scripts were applied to the live project, where `verify_rls.sql` matched and signed-out API calls are refused.
